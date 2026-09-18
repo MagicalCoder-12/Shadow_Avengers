@@ -6,7 +6,6 @@ class_name ShadowEnemyBullet
 
 @export var speed: float = 1200
 @export var damage: int = 1
-@export var debug_mode: bool = false
 
 # Shadow-specific properties
 @export var shadow_damage_multiplier: float = 1.0
@@ -29,7 +28,7 @@ func _ready():
 	# Connect to shadow mode signals
 	_connect_shadow_signals()
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow bullet spawned. Shadow: ", is_shadow_bullet)
 
 # Connect to GameManager shadow signals
@@ -54,7 +53,7 @@ func make_shadow_bullet():
 	if sprite:
 		sprite.scale = Vector2(1.3, 1.3)  # Slightly larger
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Bullet converted to shadow: Damage=", damage, " Speed=", speed)
 
 func _physics_process(delta):
@@ -68,7 +67,7 @@ func _physics_process(delta):
 func _on_area_entered(area):
 	if area is Player and player_in_area == null:
 		player_in_area = area
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("Shadow bullet hit player")
 		if area.has_method("is_just_revived") and area.is_just_revived():
 			return
@@ -84,7 +83,7 @@ func _on_area_exited(area):
 
 # Handle shadow mode activation
 func _on_shadow_mode_activated():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow mode activated for bullet")
 
 	# Convert to shadow bullet if not already
@@ -107,7 +106,7 @@ func _on_shadow_pulse_finished():
 
 # Handle shadow mode deactivation
 func _on_shadow_mode_deactivated():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow mode deactivated for bullet")
 
 # Enhanced damage for shadow bullets during shadow mode
@@ -136,7 +135,7 @@ func destroy():
 
 	is_alive = false
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow bullet destroyed at: ", global_position)
 
 	queue_free()
@@ -159,9 +158,8 @@ func enhance_bullet(damage_multiplier: float = 1.5, speed_multiplier: float = 1.
 	damage = int(damage * damage_multiplier)
 	speed = speed * speed_multiplier
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Bullet enhanced: Damage=", damage, " Speed=", speed)
-
 
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	queue_free()

@@ -2,5 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bbibb3ebgf6p0" path="res://Autoloads/Scripts/Systems/BulletFactory.gd" id="1_fghy5"]
 
+
 [node name="BulletFactory" type="Node2D" unique_id=154074501]
 script = ExtResource("1_fghy5")

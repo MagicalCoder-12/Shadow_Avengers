@@ -3,9 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://ceg6sboym3t71" path="res://HUD/LifeIcon.tscn" id="1"]
 [ext_resource type="Script" uid="uid://bpm43fhtutkx7" path="res://HUD/HUD.gd" id="2"]
 [ext_resource type="FontFile" uid="uid://c2jlmblfqj81k" path="res://Assets/fonts/IBMPlexSansJP-Medium.ttf" id="4_bkns3"]
-[ext_resource type="Texture2D" uid="uid://bosx1bop5mg50" path="res://Assets/UI/Main_Menu/Clock_Icon.png" id="7_36gqn"]
+[ext_resource type="Texture2D" uid="uid://bosx1bop5mg50" path="res://Autoloads/Scripts/Main_Menu/Clock_Icon.png" id="7_36gqn"]
 [ext_resource type="PackedScene" uid="uid://d0e0vvw0ntlk8" path="res://HUD/Power_symbol.tscn" id="7_d42kf"]
-[ext_resource type="Texture2D" uid="uid://d0hfl38rap3wf" path="res://Assets/UI/Main_Menu/BTNs/Pause_BTN.png" id="8_6i5cd"]
+[ext_resource type="Texture2D" uid="uid://d0hfl38rap3wf" path="res://Autoloads/Scripts/Main_Menu/BTNs/Pause_BTN.png" id="8_6i5cd"]
 [ext_resource type="PackedScene" uid="uid://bq8v4j2h5n8yc" path="res://HUD/ShadowModeButton.tscn" id="8_shadow"]
 
 

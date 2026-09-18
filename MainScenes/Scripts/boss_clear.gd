@@ -12,7 +12,7 @@ const Map = "res://Map/map.tscn"
 
 # Boss clear rewards - these will be calculated based on level
 var current_level: int
-@export var debug: bool = false  # Enable or disable debug logging
+
 var signals_connected: bool = false
 var screen_shown: bool = false  # Track if the screen has been shown
 
@@ -35,29 +35,31 @@ func initialize():
 	# Show boss rewards immediately
 	_show_boss_rewards()
 	
-	if debug:
+	if GameManager.debug_mode:
 		print("[BossClear Debug] Boss clear screen ready for level %d, score: %d" % [current_level, GameManager.score if GameManager else 0])
 	
-
 func _ready():
 	# Auto-initialize when the node is ready, but only if not already initialized
-	print("[BossClear Debug] _ready() called")
+	if GameManager.debug_mode:
+		print("[BossClear Debug] _ready() called")
 	if not signals_connected:
-		print("[BossClear Debug] _ready() called, auto-initializing")
+		if GameManager.debug_mode:
+			print("[BossClear Debug] _ready() called, auto-initializing")
 		initialize()
 	else:
-		print("[BossClear Debug] _ready() called, already initialized")
+		if GameManager.debug_mode:
+			print("[BossClear Debug] _ready() called, already initialized")
 
 func set_score(value: int) -> void:
 	# Update the score label
-	if debug:
+	if GameManager.debug_mode:
 		print("[BossClear Debug] set_score called with value: %d" % value)
 	if scoreLabel:
 		scoreLabel.text = "Level Score: %d" % value
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] scoreLabel.text set to: %s" % scoreLabel.text)
 	else:
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] ERROR: scoreLabel is null!")
 
 func _show_boss_rewards() -> void:
@@ -72,7 +74,7 @@ func _show_boss_rewards() -> void:
 	if crystal_label:
 		crystal_label.text = "Crystals: +%d" % rewards.crystals
 	
-	if debug:
+	if GameManager.debug_mode:
 		print("[BossClear Debug] Displaying boss rewards: %d void shards, %d coins, %d crystals" % [rewards.void_shards, rewards.coins, rewards.crystals])
 
 func _calculate_boss_rewards() -> Dictionary:
@@ -110,12 +112,12 @@ func _apply_boss_rewards() -> void:
 		
 		if collected_coins > 0:
 			GameManager.add_currency("coins", collected_coins)
-			if debug:
+			if GameManager.debug_mode:
 				print("[BossClear Debug] Added %d collected coins from level" % collected_coins)
 				
 		if collected_crystals > 0:
 			GameManager.add_currency("crystals", collected_crystals)
-			if debug:
+			if GameManager.debug_mode:
 				print("[BossClear Debug] Added %d collected crystals from level" % collected_crystals)
 		
 		# Reset level collected currencies
@@ -128,7 +130,7 @@ func _apply_boss_rewards() -> void:
 		# Play reward sound effect
 		_play_sound_effect("boss_victory")
 		
-		if debug:
+		if GameManager.debug_mode:
 			if is_first_time:
 				print("[BossClear Debug] Applied boss rewards: %d void shards, %d coins, %d crystals" % [rewards.void_shards, rewards.coins, rewards.crystals])
 			else:
@@ -141,10 +143,10 @@ func _apply_boss_rewards() -> void:
 			else:
 				total_rewards_label.text = "Boss Already Defeated!"
 			total_rewards_label.show()
-			if debug:
+			if GameManager.debug_mode:
 				print("[BossClear Debug] Showing total rewards applied message")
 	else:
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] Error: GameManager not found, cannot apply boss rewards")
 
 func _play_sound_effect(sound_type: String) -> void:
@@ -153,10 +155,10 @@ func _play_sound_effect(sound_type: String) -> void:
 		if sound_stream:
 			AudioManager.play_sound_effect(sound_stream, "Master")  # Use Master bus
 		else:
-			if debug:
+			if GameManager.debug_mode:
 				print("[BossClear Debug] Warning: Sound stream for %s not found" % sound_type)
 	else:
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] Warning: AudioManager not found, cannot play sound effect")
 
 # Add a method to show the boss clear screen
@@ -176,10 +178,10 @@ func show_boss_clear():
 		add_child(auto_unlock_timer)
 		auto_unlock_timer.start()
 		
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] Boss clear screen shown and rewards applied")
 
-		if debug:
+		if GameManager.debug_mode:
 			print("[BossClear Debug] Boss clear screen shown and rewards applied")
 
 func _on_auto_unlock_timeout():
@@ -192,7 +194,6 @@ func _on_next_pressed() -> void:
 		# Navigate to map
 		GameManager.change_scene(GameManager.get_map_scene_path())
 
-
 func _on_map_pressed() -> void:
 	if GameManager:
 		_commit_boss_level_completion_if_needed()
@@ -203,7 +204,6 @@ func _commit_boss_level_completion_if_needed() -> void:
 		return
 	if not GameManager.is_level_completed(current_level):
 		GameManager.complete_level(current_level)
-
 
 func _on_restart_pressed() -> void:
 	if GameManager:

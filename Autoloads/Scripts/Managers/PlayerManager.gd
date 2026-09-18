@@ -4,6 +4,7 @@ extends Node
 var gm: Node
 var default_ship_id: String = "Ship1"
 var selected_ship_id: String
+var _reviving: bool = false  # Prevent re-entry during await
 var selected_satellite_ids: Array[String] = []  # Array of selected satellite IDs
 const DEFAULT_SATELLITE_ID: String = "Satellite1"
 var player_spawn_position: Vector2 = Vector2.ZERO
@@ -135,6 +136,11 @@ func spawn_player(lives: int, apply_revive_state: bool = false) -> void:
 
 # Keep revive default at one life to match game-over revive UI expectations.
 func revive_player(lives: int = 1) -> void:
+	# Guard against re-entry during the await at the end.
+	if _reviving:
+		return
+	_reviving = true
+
 	# Always reset the ad manager's revive pending state to prevent double revives
 	gm.reset_ad_revive_state()
 
@@ -171,8 +177,9 @@ func revive_player(lives: int = 1) -> void:
 
 	# Hide banner ad when reviving player to prevent conflicts
 	gm.hide_banner_ad_if_initialized()
-	# Add a small delay before potentially showing banner again
+	# Small delay before banner ad can be shown again.
 	await gm.get_tree().create_timer(1.0).timeout
+	_reviving = false
 
 
 func _hide_game_over_screen(current_scene: Node) -> void:

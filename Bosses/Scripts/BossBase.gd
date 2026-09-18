@@ -489,6 +489,12 @@ func finish_pattern_execution() -> void:
 	_pattern_execution_in_progress = false
 	pattern_execution_finished.emit()
 
+## Safe timer await — returns true if the boss is still alive and in the tree,
+## false if it was freed during the wait (caller should return immediately).
+func _await_boss_timer(duration: float) -> bool:
+	await get_tree().create_timer(duration).timeout
+	return is_inside_tree() and not _death_sequence_started
+
 func _has_property(target: Object, property_name: String) -> bool:
 	for property in target.get_property_list():
 		if property.get("name", "") == property_name:

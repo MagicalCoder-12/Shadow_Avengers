@@ -179,7 +179,7 @@ func fire_at_player() -> void:
 	bullet.rotation = direction.angle() + PI / 2.0
 	SceneSpawnService.spawn_child(bullet)
 	TutorialManager.notify_enemy_bullet_spawned(bullet)
-	if _enemy.debug_mode:
+	if GameManager.debug_mode:
 		print("Enemy fired bullet")
 
 func fire_spread_shot(bullet_count: int = 2, spread_angle: float = PI / 6.0) -> void:

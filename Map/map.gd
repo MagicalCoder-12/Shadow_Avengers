@@ -66,7 +66,8 @@ func _check_and_show_difficulty_unlocked():
 			# Mark as shown
 			GameManager.save_manager.difficulty_unlocked_showed = true
 			GameManager.save_progress()
-			print("Map: Difficulty selection unlocked notification shown")
+			if GameManager.debug_mode:
+				print("Map: Difficulty selection unlocked notification shown")
 		
 		# Check for hard difficulty unlock (level 20)
 		if GameManager.save_manager.is_hard_globally_unlocked() and not GameManager.save_manager.hard_difficulty_unlocked_showed:
@@ -75,7 +76,8 @@ func _check_and_show_difficulty_unlocked():
 			# Mark as shown
 			GameManager.save_manager.hard_difficulty_unlocked_showed = true
 			GameManager.save_progress()
-			print("Map: Hard difficulty selection unlocked notification shown")
+			if GameManager.debug_mode:
+				print("Map: Hard difficulty selection unlocked notification shown")
 
 # Show difficulty unlock notification
 func _show_difficulty_unlocked():
@@ -274,8 +276,11 @@ func _on_level_button_pressed(_level_num: int) -> void:
 			# Set the target level for the difficulty panel
 			if difficulty_panel.has_method("set_target_level"):
 				difficulty_panel.set_target_level(_level_num)
-				print("Map: Set target level to ", _level_num)
+				if GameManager.debug_mode:
+					print("Map: Set target level to ", _level_num)
 		else:
-			print("Map: DifficultySelection panel not found in canvaslayer")
+			if GameManager.debug_mode:
+				print("Map: DifficultySelection panel not found in canvaslayer")
 	else:
-		print("Map: CanvasLayer not found")
+		if GameManager.debug_mode:
+			print("Map: CanvasLayer not found")

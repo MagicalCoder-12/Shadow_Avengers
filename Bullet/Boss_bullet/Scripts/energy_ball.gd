@@ -115,7 +115,8 @@ func explode() -> void:
 	if visual_duration > 0.0:
 		await get_tree().create_timer(visual_duration).timeout
 	
-	queue_free()
+	if is_inside_tree():
+		queue_free()
 
 
 func _deal_explosion_damage() -> void:

@@ -20,7 +20,8 @@ func _schedule_fallback_cleanup() -> void:
 	if particles:
 		fallback_duration = max(fallback_duration, particles.lifetime + 0.05)
 	await get_tree().create_timer(fallback_duration).timeout
-	_finish_effect()
+	if is_inside_tree():
+		_finish_effect()
 
 func _on_particles_finished() -> void:
 	_finish_effect()

@@ -12,7 +12,6 @@ var revive_type: String = "none"
 var ad_revive_pending: bool = false
 var revive_timeout_timer: Timer
 var is_banner_showing: bool = false
-var enable_debug_logging: bool = false  # Toggle for debug messages
 var _rewarded_ad_shown: bool = false  # Track if a rewarded ad has been shown
 var _initialized: bool = false
 var _banner_retry_count: int = 0
@@ -47,13 +46,6 @@ func is_game_over_screen_active() -> bool:
 			return true
 	
 	return false
-
-# Signals
-@warning_ignore("unused_signal")
-signal ad_reward_granted(ad_type: String)
-@warning_ignore("unused_signal")
-signal ad_failed_to_load(ad_type: String, error_data: Variant)
-
 func _ready() -> void:
 	# Keep ad lifecycle callbacks and retries alive even when gameplay is paused.
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -231,7 +223,7 @@ func _connect_admob_signals() -> void:
 	_debug_log("All available Admob signals processed")
 
 func _debug_log(message: String) -> void:
-	if enable_debug_logging:
+	if gm.debug_mode:
 		print("[AdManager Debug] " + message)
 
 func _get_menu_scene_paths() -> Array[String]:
@@ -477,7 +469,7 @@ func _handle_rewarded_load_failure(is_video: bool, error_data: Variant, request_
 	if _rewarded_retry_count < max_ad_retries:
 		_rewarded_retry_count += 1
 		await _create_always_timer(5.0).timeout
-		if not is_initialized or not _is_current_request_nonce(request_nonce):
+		if not is_initialized or not _is_current_request_nonce(request_nonce) or not is_instance_valid(admob):
 			return
 		if is_video:
 			_set_load_waiting(true, "video", request_nonce)
@@ -569,8 +561,6 @@ func _on_rewarded_ad_dismissed(is_video: bool) -> void:
 			var reward_type := current_reward_type
 			_clear_reward_request_state()
 			_emit_ad_failed(reward_type, {"message": "Ad closed before reward was earned"})
-
-
 func request_ad_revive() -> bool:
 	_debug_log("Requesting ad revive")
 	return _begin_rewarded_request(true)
@@ -650,7 +640,6 @@ func _on_admob_banner_ad_loaded(_ad_id: String) -> void:
 func _on_admob_banner_ad_failed_to_load(_ad_id: String, error_data: Variant) -> void:
 	var error_info: String = _get_error_message(error_data)
 	var error_code: int = _get_error_code(error_data)
-	print("Banner ad failed to load. Error: %s, Code: %s" % [error_info, error_code])
 	_debug_log("Banner ad failed to load: %s (Code: %s)" % [error_info, error_code])
 
 	if _banner_retry_count < max_ad_retries:

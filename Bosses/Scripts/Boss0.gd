@@ -100,8 +100,8 @@ func _pattern_p2_spiral_wave() -> void:
 			if bullet and bullet.has_method("set_turn_rate"):
 				bullet.set_turn_rate(0.025)
 
-	await get_tree().create_timer(0.1).timeout
-	finish_pattern_execution()
+	if await _await_boss_timer(0.1):
+		finish_pattern_execution()
 
 func _show_muzzle_flash() -> void:
 	if nozzle:

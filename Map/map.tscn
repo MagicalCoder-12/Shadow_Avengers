@@ -9,16 +9,15 @@
 [ext_resource type="Texture2D" uid="uid://b6a2r8ennyrn7" path="res://Assets/Background/bg2.png" id="4_eiwrt"]
 [ext_resource type="Texture2D" uid="uid://x8bdqinealjc" path="res://Assets/guibuttons/RedButton-Active.png" id="7_lymsy"]
 [ext_resource type="Texture2D" uid="uid://dutffj6j65vue" path="res://Assets/guibuttons/RedButton-Hover.png" id="8_5cbny"]
-[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Assets/UI/Main_Menu/BTNs_Active/Backward_BTN.png" id="11_0th5g"]
-[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Assets/UI/Main_Menu/BTNs/Backward_BTN.png" id="11_31513"]
+[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png" id="11_0th5g"]
+[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Backward_BTN.png" id="11_31513"]
 [ext_resource type="AudioStream" uid="uid://ctac111ndd0mx" path="res://Assets/Music/Start.ogg" id="11_ptuj4"]
 [ext_resource type="Texture2D" uid="uid://g6s5vmg16xj5" path="res://Assets/Background/Background.png" id="12_rr5ff"]
-[ext_resource type="Texture2D" uid="uid://g7jw3gmvkv4p" path="res://Assets/UI/Main_Menu/BTNs/Shop_BTN.png" id="14_hry20"]
-[ext_resource type="Texture2D" uid="uid://cnsxlue1203ri" path="res://Assets/UI/Main_Menu/BTNs_Active/Shop_BTN.png" id="16_t5i76"]
+[ext_resource type="Texture2D" uid="uid://g7jw3gmvkv4p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Shop_BTN.png" id="14_hry20"]
+[ext_resource type="Texture2D" uid="uid://cnsxlue1203ri" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Shop_BTN.png" id="16_t5i76"]
 [ext_resource type="PackedScene" uid="uid://djv02b634b0pv" path="res://MainScenes/difficulty_selection.tscn" id="16_xoeuw"]
 [ext_resource type="PackedScene" uid="uid://cb4y2g0ulc7gu" path="res://MainScenes/difficulty_unlocked.tscn" id="17_tgjig"]
 [ext_resource type="PackedScene" uid="uid://cvp3h6kj6bqrh" path="res://MainScenes/harddifficulty_unlocked.tscn" id="18_5ps16"]
-
 
 [sub_resource type="LabelSettings" id="LabelSettings_bmidu"]
 font = ExtResource("2_3g1qk")

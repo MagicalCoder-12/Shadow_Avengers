@@ -100,7 +100,8 @@ func _on_start_pressed() -> void:
 	
 	# Load enemy data from JSON file based on difficulty
 	if level_selection_manager.load_enemy_data_for_difficulty():
-		print("Difficulty selection: Enemy data loaded successfully")
+		if GameManager.debug_mode:
+			print("Difficulty selection: Enemy data loaded successfully")
 		
 		# Emit signal that difficulty selection is complete
 		level_selection_manager.difficulty_selection_complete.emit()
@@ -116,10 +117,12 @@ func _on_start_pressed() -> void:
 			else:
 				get_tree().change_scene_to_file(level_path)
 		else:
-			print("Error: No level path selected")
+			if GameManager.debug_mode:
+				print("Error: No level path selected")
 			hide()
 	else:
-		print("Error: Failed to load enemy data")
+		if GameManager.debug_mode:
+			print("Error: Failed to load enemy data")
 		hide()
 
 func _on_visibility_changed() -> void:
@@ -163,7 +166,8 @@ func _is_difficulty_unlocked(difficulty: FormationEnums.DifficultyLevel) -> bool
 			# 2. Target level L Easy is completed (per-level unlock)
 			var global_unlock = _is_normal_globally_unlocked()
 			var per_level_unlock = _is_level_completed_in_difficulty(target_level, "Easy")
-			print("DifficultySelection: Normal check - global=%s, level_%d_easy=%s" % [global_unlock, target_level, per_level_unlock])
+			if GameManager.debug_mode:
+				print("DifficultySelection: Normal check - global=%s, level_%d_easy=%s" % [global_unlock, target_level, per_level_unlock])
 			return global_unlock and per_level_unlock
 		FormationEnums.DifficultyLevel.HARD:
 			# Hard is unlocked if:
@@ -172,7 +176,8 @@ func _is_difficulty_unlocked(difficulty: FormationEnums.DifficultyLevel) -> bool
 			# 2. Target level L Normal is completed (per-level unlock)
 			var global_unlock = _is_hard_globally_unlocked()
 			var per_level_unlock = _is_level_completed_in_difficulty(target_level, "Normal")
-			print("DifficultySelection: Hard check - global=%s, level_%d_normal=%s" % [global_unlock, target_level, per_level_unlock])
+			if GameManager.debug_mode:
+				print("DifficultySelection: Hard check - global=%s, level_%d_normal=%s" % [global_unlock, target_level, per_level_unlock])
 			return global_unlock and per_level_unlock
 		_:
 			return false

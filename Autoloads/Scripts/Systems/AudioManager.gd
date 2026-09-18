@@ -23,6 +23,11 @@ var current_background_music: AudioStream
 var _original_bus_volumes: Dictionary = {}
 var _last_sfx_play_time_ms_by_bus: Dictionary = {}
 
+# Audio player pool — avoids creating/destroying nodes per SFX.
+const SFX_POOL_SIZE: int = 16
+var _sfx_pool: Array[AudioStreamPlayer] = []
+var _sfx_pool_index: int = 0
+
 func _ready() -> void:
 	# Validate bus indices
 	if background_bus_idx == -1: push_error("Background bus not found")
@@ -35,7 +40,6 @@ func _ready() -> void:
 	background_player.bus = "Background"
 	add_child(background_player)
 	_apply_default_mix_targets()
-	print("AudioManager initialized with background player on Background bus")
 
 func play_background_music(stream: AudioStream, force_restart: bool = false) -> void:
 	if not stream:
@@ -46,18 +50,15 @@ func play_background_music(stream: AudioStream, force_restart: bool = false) -> 
 		call_deferred("play_background_music", stream, force_restart)
 		return
 	if current_background_music == stream and background_player.playing and not force_restart:
-		print("Background music already playing: ", stream.resource_path)
 		return
 	current_background_music = stream
 	background_player.stream = stream
 	background_player.play()
 	AudioServer.set_bus_mute(background_bus_idx, false) # Ensure unmuted
-	print("Playing background music: ", stream.resource_path)
 
 func stop_background_music() -> void:
 	background_player.stop()
 	current_background_music = null
-	print("Background music stopped")
 
 # Reset all audio state for clean restart
 func reset_audio_state() -> void:
@@ -69,7 +70,6 @@ func reset_audio_state() -> void:
 	mute_bus("Bullet", false)
 	mute_bus("Explosion", false)
 	mute_bus("Boss", false)
-	print("Audio state reset for restart")
 
 func play_sound_effect(stream: AudioStream, bus: String) -> void:
 	if not stream:
@@ -77,13 +77,10 @@ func play_sound_effect(stream: AudioStream, bus: String) -> void:
 		return
 	if _should_throttle_sound_effect(bus):
 		return
-	var player = AudioStreamPlayer.new()
+	var player := _get_sfx_player()
 	player.bus = bus
 	player.stream = stream
-	if bus == "Bullet":
-		player.volume_db = BULLET_SFX_VOLUME_DB
-	player.finished.connect(player.queue_free) # Auto-free when done
-	add_child(player)
+	player.volume_db = BULLET_SFX_VOLUME_DB if bus == "Bullet" else 0.0
 	player.play()
 
 func _should_throttle_sound_effect(bus: String) -> bool:
@@ -115,19 +112,14 @@ func set_gameplay_mix(enabled: bool) -> void:
 func mute_audio_buses(mute: bool, exclude_video: bool = false) -> void:
 	if background_bus_idx >= 0:
 		AudioServer.set_bus_mute(background_bus_idx, mute)
-		print("Background bus muted: ", mute)
 	if bullet_bus_idx >= 0:
 		AudioServer.set_bus_mute(bullet_bus_idx, mute)
-		print("Bullet bus muted: ", mute)
 	if boss_bus_idx >= 0:
 		AudioServer.set_bus_mute(boss_bus_idx, mute)
-		print("Boss bus muted: ", mute)
 	if explosion_bus_idx >= 0:
 		AudioServer.set_bus_mute(explosion_bus_idx, mute)
-		print("Explosion bus muted: ", mute)
 	if exclude_video and video_bus_idx >= 0:
 		AudioServer.set_bus_mute(video_bus_idx, false)
-		print("Video bus unmuted (excluded)")
 
 func lower_bus_volumes_except(exclude_buses: Array[String], volume_db: float) -> void:
 	_original_bus_volumes = {}
@@ -136,16 +128,12 @@ func lower_bus_volumes_except(exclude_buses: Array[String], volume_db: float) ->
 		if bus_name not in exclude_buses:
 			_original_bus_volumes[bus_name] = AudioServer.get_bus_volume_db(bus_idx)
 			AudioServer.set_bus_volume_db(bus_idx, volume_db)
-			print("Lowered volume of bus %s to %s dB" % [bus_name, volume_db])
-		else:
-			print("Skipped bus %s" % bus_name)
 
 func restore_bus_volumes() -> void:
 	for bus_name in _original_bus_volumes:
 		var bus_idx = AudioServer.get_bus_index(bus_name)
 		if bus_idx != -1:
 			AudioServer.set_bus_volume_db(bus_idx, _original_bus_volumes[bus_name])
-			print("Restored volume of bus %s to %s dB" % [bus_name, _original_bus_volumes[bus_name]])
 	_original_bus_volumes.clear()
 
 func stop_scene_audio_players(root: Node) -> void:
@@ -156,8 +144,22 @@ func stop_scene_audio_players(root: Node) -> void:
 			var node = nodes.pop_front()
 			if node is AudioStreamPlayer or node is AudioStreamPlayer2D:
 				node.stop()
-				print("Stopped audio player: ", node.name)
 			nodes.append_array(node.get_children())
+
+func _get_sfx_player() -> AudioStreamPlayer:
+	# Lazy-init the pool on first use.
+	if _sfx_pool.is_empty():
+		_sfx_pool.resize(SFX_POOL_SIZE)
+		for i in SFX_POOL_SIZE:
+			var p := AudioStreamPlayer.new()
+			add_child(p)
+			_sfx_pool[i] = p
+
+	# Round-robin through the pool. If the chosen player is still playing,
+	# the sound is dropped rather than stacking infinitely.
+	var player := _sfx_pool[_sfx_pool_index]
+	_sfx_pool_index = (_sfx_pool_index + 1) % SFX_POOL_SIZE
+	return player
 
 func mute_bus(bus_name: String, mute: bool) -> void:
 	var bus_idx = AudioServer.get_bus_index(bus_name)
@@ -165,4 +167,3 @@ func mute_bus(bus_name: String, mute: bool) -> void:
 		push_error("Bus %s not found!" % bus_name)
 		return
 	AudioServer.set_bus_mute(bus_idx, mute)
-	print("Bus %s %s" % [bus_name, "muted" if mute else "unmuted"])

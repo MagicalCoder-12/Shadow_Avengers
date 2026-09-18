@@ -7,7 +7,6 @@ var enemy_data: Dictionary = {}
 var _enemy_data_cache: Dictionary = {}
 var _preloaded_level_path: String = ""
 var _preloaded_level_scene: PackedScene = null
-
 # Signal for when difficulty selection is complete and ready to load level
 @warning_ignore("unused_signal")
 signal difficulty_selection_complete
@@ -21,11 +20,13 @@ func _ready():
 
 func set_selected_level(level_path: String) -> void:
 	selected_level_path = level_path
-	print("LevelSelectionManager: Selected level path set to %s" % level_path)
+	if GameManager.debug_mode:
+		print("LevelSelectionManager: Selected level path set to %s" % level_path)
 
 func set_selected_difficulty(difficulty: formation_enums.DifficultyLevel) -> void:
 	selected_difficulty = difficulty
-	print("LevelSelectionManager: Selected difficulty set to %s" % formation_enums.DifficultyLevel.keys()[difficulty])
+	if GameManager.debug_mode:
+		print("LevelSelectionManager: Selected difficulty set to %s" % formation_enums.DifficultyLevel.keys()[difficulty])
 
 func load_enemy_data_for_difficulty() -> bool:
 	# Load enemy data based on selected difficulty
@@ -38,12 +39,14 @@ func load_enemy_data_for_difficulty() -> bool:
 	var file_path = _get_enemy_file_path_for_difficulty(difficulty_name)
 	var parsed_data = _load_enemy_data_from_file(file_path)
 	if parsed_data.is_empty():
-		print("LevelSelectionManager: Failed to load enemy data for %s difficulty" % difficulty_name)
+		if GameManager.debug_mode:
+			print("LevelSelectionManager: Failed to load enemy data for %s difficulty" % difficulty_name)
 		return false
 
 	_enemy_data_cache[difficulty_name] = parsed_data.duplicate(true)
 	enemy_data = parsed_data.duplicate(true)
-	print("LevelSelectionManager: Loaded enemy data for %s difficulty" % difficulty_name)
+	if GameManager.debug_mode:
+		print("LevelSelectionManager: Loaded enemy data for %s difficulty" % difficulty_name)
 	return true
 
 func request_level_preload(level_path: String) -> void:
@@ -138,4 +141,5 @@ func clear_selection() -> void:
 	enemy_data = {}
 	_preloaded_level_path = ""
 	_preloaded_level_scene = null
-	print("LevelSelectionManager: Selection cleared")
+	if GameManager.debug_mode:
+		print("LevelSelectionManager: Selection cleared")

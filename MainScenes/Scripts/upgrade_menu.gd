@@ -121,10 +121,6 @@ func _ready() -> void:
 	# Connect to visibility notifications
 	connect("visibility_changed", _on_visibility_changed)
 
-	# Use the proper method to set reference
-	if GameManager.has_method("set_upgrade_menu_ref"):
-		GameManager.set_upgrade_menu_ref(self)
-	
 	# Connect the selected ship's gui_input signal to handle toggle functionality
 	if selected_ship and not selected_ship.is_connected("gui_input", _on_selected_ship_gui_input):
 		selected_ship.gui_input.connect(_on_selected_ship_gui_input)
@@ -781,7 +777,10 @@ func _on_upgrade_crystals_pressed() -> void:
 	if not TutorialManager.can_upgrade_in_shop():
 		return
 	if _upgrade_selected_item("crystals"):
-		TutorialManager.notify_upgrade_completed()
+		if is_satellite_tab_active:
+			TutorialManager.notify_satellite_upgraded()
+		else:
+			TutorialManager.notify_upgrade_completed()
 	else:
 		_show_upgrade_failed_feedback()
 
@@ -789,7 +788,10 @@ func _on_upgrade_coins_pressed() -> void:
 	if not TutorialManager.can_upgrade_in_shop():
 		return
 	if _upgrade_selected_item("coins"):
-		TutorialManager.notify_upgrade_completed()
+		if is_satellite_tab_active:
+			TutorialManager.notify_satellite_upgraded()
+		else:
+			TutorialManager.notify_upgrade_completed()
 	else:
 		_show_upgrade_failed_feedback()
 
@@ -932,18 +934,19 @@ func _get_current_evolution_name(ship_id: String, stage: int) -> String:
 	else:
 		push_warning("ConfigLoader not available. Using default evolution names.")
 
-	# Fallback evolution names
-	var fallback_names = {
-		"Ship1": ["NoctiSol", "Solstice", "Eclipse Sovereign"],
-		"Ship2": ["Aether Strike", "Void Piercer", "Quantum Saber"],
-		"Ship3": ["Astra Blade", "Astra Striker", "Astra Prime"],
-		"Ship4": ["Phantom Drake", "Spectral Wyrm", "Ethereal Leviathan", "Void Dragon", "Cosmic Serpent"],
-		"Ship5": ["Umbra Wraith", "Shadow Reaper", "Darkness Incarnate", "Void Phantom", "Abyssal Terror", "Nightmare Sovereign", "Obsidian Specter", "Eclipse Revenant", "Nether Shade", "Celestial Wraith"],
-		"Ship6": ["Void Howler", "Cosmic Screamer", "Stellar Devourer", "Galactic Destroyer", "Nova Reaver", "Quantum Predator", "Singularity Hunter", "Infinity Ravager"],
-		"Ship7": ["Tenebris Fang", "Shadow Blade", "Darkness Cutter", "Void Ripper", "Abyssal Slicer", "Nightmare Edge", "Phantom Cleaver", "Spectral Razor", "Ethereal Scythe"],
-		"Ship8": ["Oblivion Viper", "Void Serpent", "Cosmic Cobra", "Stellar Python", "Galactic Anaconda", "Universal Leviathan", "Infinity Wyrm"]
-	}
-	evolution_names = fallback_names.get(ship_id, null)
+	# Fallback evolution names (used only when ConfigLoader data is unavailable)
+	if not evolution_names:
+		var fallback_names = {
+			"Ship1": ["NoctiSol", "Solstice", "Eclipse Sovereign"],
+			"Ship2": ["Aether Strike", "Void Piercer", "Quantum Saber"],
+			"Ship3": ["Astra Blade", "Astra Striker", "Astra Prime"],
+			"Ship4": ["Phantom Drake", "Spectral Wyrm", "Ethereal Leviathan", "Void Dragon", "Cosmic Serpent"],
+			"Ship5": ["Umbra Wraith", "Shadow Reaper", "Darkness Incarnate", "Void Phantom", "Abyssal Terror", "Nightmare Sovereign", "Obsidian Specter", "Eclipse Revenant", "Nether Shade", "Celestial Wraith"],
+			"Ship6": ["Void Howler", "Cosmic Screamer", "Stellar Devourer", "Galactic Destroyer", "Nova Reaver", "Quantum Predator", "Singularity Hunter", "Infinity Ravager"],
+			"Ship7": ["Tenebris Fang", "Shadow Blade", "Darkness Cutter", "Void Ripper", "Abyssal Slicer", "Nightmare Edge", "Phantom Cleaver", "Spectral Razor", "Ethereal Scythe"],
+			"Ship8": ["Oblivion Viper", "Void Serpent", "Cosmic Cobra", "Stellar Python", "Galactic Anaconda", "Universal Leviathan", "Infinity Wyrm"]
+		}
+		evolution_names = fallback_names.get(ship_id, null)
 
 	if evolution_names == null:
 		return "Unknown"
@@ -957,16 +960,17 @@ func _get_current_satellite_evolution_name(satellite_id: String, stage: int) -> 
 	else:
 		push_warning("ConfigLoader not available. Using default satellite evolution names.")
 
-	# Fallback satellite evolution names
-	var fallback_names = {
-		"Satellite1": ["Orbital Guardian", "Cosmic Sentinel", "Galactic Warden"],
-		"Satellite2": ["Pulsar Companion", "Nebula Satellite", "Stellar Anchor"],
-		"Satellite3": ["Quantum Echo", "Phase Satellite", "Dimensional Beacon"],
-		"Satellite4": ["Solar Flare", "Corona Satellite", "Helios Guardian"],
-		"Satellite5": ["Lunar Shield", "Tidal Satellite", "Moonbeam Sentinel"],
-		"Satellite6": ["Astral Link", "Spirit Satellite", "Ethereal Beacon"]
-	}
-	evolution_names = fallback_names.get(satellite_id, null)
+	# Fallback satellite evolution names (used only when ConfigLoader data is unavailable)
+	if not evolution_names:
+		var fallback_names = {
+			"Satellite1": ["Orbital Guardian", "Cosmic Sentinel", "Galactic Warden"],
+			"Satellite2": ["Pulsar Companion", "Nebula Satellite", "Stellar Anchor"],
+			"Satellite3": ["Quantum Echo", "Phase Satellite", "Dimensional Beacon"],
+			"Satellite4": ["Solar Flare", "Corona Satellite", "Helios Guardian"],
+			"Satellite5": ["Lunar Shield", "Tidal Satellite", "Moonbeam Sentinel"],
+			"Satellite6": ["Astral Link", "Spirit Satellite", "Ethereal Beacon"]
+		}
+		evolution_names = fallback_names.get(satellite_id, null)
 
 	if evolution_names == null:
 		return "Satellite %s" % stage
@@ -1104,7 +1108,8 @@ func _show_message(text: String) -> void:
 		msg_panel.show()
 		# Hide the message after a delay
 		await get_tree().create_timer(1.0).timeout
-		msg_panel.hide()
+		if is_inside_tree() and msg_panel:
+			msg_panel.hide()
 
 func _show_warning(text: String) -> void:
 	if warning and warning_panel:
@@ -1112,17 +1117,8 @@ func _show_warning(text: String) -> void:
 		warning_panel.show()
 		# Hide the warning after a delay
 		await get_tree().create_timer(1.0).timeout
-		warning_panel.hide()
-
-func _process(_delta: float) -> void:
-	# Only run this check for a short time after initialization
-	if not has_method("_check_currency_display_update"):
-		return
-	
-	# Check if currency display needs updating (fallback mechanism)
-	if not currency_display_updated:
-		_update_currency_display()
-		currency_display_updated = true
+		if is_inside_tree() and warning_panel:
+			warning_panel.hide()
 
 func _initialize_refresh_timer() -> void:
 	refresh_timer = Timer.new()
@@ -1177,6 +1173,9 @@ func _on_satellites_pressed() -> void:
 		update_satellite_ui()
 		# Show/hide appropriate selection buttons
 		_update_selection_buttons_visibility()
+
+	# Notify tutorial that satellite tab was opened
+	TutorialManager.notify_satellite_tab_opened()
 
 
 

@@ -87,8 +87,8 @@ func _pattern_phase_1_radial_gap_burst() -> void:
 		if abs(angle_delta) < safe_gap_half_angle:
 			continue
 		spawn_bullet(HELL_PATTERN_SCENE, fire_position, Vector2.RIGHT.rotated(angle), 600.0, boss_bullet_damage_phase_1, 5.2)
-	await get_tree().create_timer(pattern_pause_short).timeout
-	finish_pattern_execution()
+	if await _await_boss_timer(pattern_pause_short):
+		finish_pattern_execution()
 
 func _pattern_phase_1_cross_lane_punish() -> void:
 	var side_markers := _get_side_markers()
@@ -103,9 +103,14 @@ func _pattern_phase_1_cross_lane_punish() -> void:
 		spawn_bullet(HELL_PATTERN_SCENE, fire_position, vertical_direction, 680.0, boss_bullet_damage_phase_1, 4.8)
 		spawn_bullet(HELL_PATTERN_SCENE, fire_position, vertical_direction.rotated(0.12 if marker.name == "Left" else -0.12), 680.0, boss_bullet_damage_phase_1, 4.8)
 
-	await get_tree().create_timer(pattern_pause_medium).timeout
+	if not await _await_boss_timer(pattern_pause_medium):
+		finish_pattern_execution()
+		return
 	var center_fire_position := _get_center_fire_position()
 	await _show_muzzle_flash_and_wait(center_fire_position)
+	if not is_inside_tree():
+		finish_pattern_execution()
+		return
 	var punish_direction := _get_player_direction(center_fire_position)
 	var punish_ball := spawn_bullet(ENERGY_BALL_SCENE, center_fire_position, punish_direction, 390.0, boss_bullet_damage_phase_1, 4.6)
 	if punish_ball and punish_ball.has_method("set_speed"):
@@ -118,6 +123,7 @@ func _pattern_phase_2_double_spiral_sniper() -> void:
 
 	for step in range(8):
 		await _show_muzzle_flash_and_wait(fire_position)
+		if not is_inside_tree(): break
 		var rotation_offset := step * 0.24
 		var spiral_a := Vector2.RIGHT.rotated(base_angle + rotation_offset)
 		var spiral_b := Vector2.RIGHT.rotated(base_angle + PI + rotation_offset)
@@ -128,7 +134,7 @@ func _pattern_phase_2_double_spiral_sniper() -> void:
 			var homing := spawn_bullet(HOMING_BULLET_SCENE, fire_position, snipe_direction, 490.0, boss_bullet_damage_phase_2, 4.2)
 			if homing and homing.has_method("set_turn_rate"):
 				homing.set_turn_rate(0.024)
-		await get_tree().create_timer(0.1).timeout
+		if not await _await_boss_timer(0.1): break
 	finish_pattern_execution()
 
 func _pattern_phase_2_collapsing_circle() -> void:
@@ -146,7 +152,9 @@ func _pattern_phase_2_collapsing_circle() -> void:
 			continue
 		spawn_bullet(HELL_PATTERN_SCENE, fire_position, Vector2.RIGHT.rotated(angle), 520.0, boss_bullet_damage_phase_2, 5.6)
 
-	await get_tree().create_timer(pattern_pause_short).timeout
+	if not await _await_boss_timer(pattern_pause_short):
+		finish_pattern_execution()
+		return
 
 	for bullet_index in range(inner_bullets):
 		var angle := TAU * float(bullet_index) / float(inner_bullets) + 0.16

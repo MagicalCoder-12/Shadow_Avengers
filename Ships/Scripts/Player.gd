@@ -39,7 +39,6 @@ var plNormalBullet: PackedScene = preload("res://Bullet/PlBullet/Bullet.tscn")  
 @export var shadow_bullet_count: int = 25
 @export var base_bullet_damage: int = 20
 @export var shadow_texture: Texture2D = preload("res://Assets/player/g-02.png")
-@export var enable_debug_logging: bool = false  # Toggle for debug messages
 @export var evolution_textures: Array[Texture2D] = []  # Textures for each evolution stage
 
 # Local variables
@@ -211,17 +210,8 @@ func _apply_initial_state() -> void:
 func _initialize_satellites() -> void:
 	satellite_service.initialize_satellites()
 
-func _load_satellite_scenes() -> void:
-	satellite_service.load_satellite_scenes()
-
-func _add_satellites_from_selection() -> void:
-	satellite_service.add_satellites_from_selection()
-
-func _add_satellite(satellite_scene: PackedScene, position_index: int) -> void:
-	satellite_service.add_satellite(satellite_scene, position_index)
-
 func _debug_log(message: String) -> void:
-	if enable_debug_logging:
+	if GameManager.debug_mode:
 		print("[Player Debug] " + message)
 
 func update_satellites_from_selection() -> void:
@@ -580,8 +570,6 @@ func _on_player_manager_satellites_changed() -> void:
 	"""Handle when PlayerManager's selected satellites are changed"""
 	satellite_service.update_satellites_from_selection()
 	_debug_log("Satellite selection updated from PlayerManager")
-
-
 func _calculate_satellite_offset(position_index: int) -> Vector2:
 	return satellite_service.calculate_satellite_offset(position_index)
 

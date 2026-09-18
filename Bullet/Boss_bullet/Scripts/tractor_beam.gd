@@ -14,7 +14,7 @@ func _ready() -> void:
 	if animated_sprite:
 		animated_sprite.play("default")
 	else:
-		print("Warning: No AnimatedSprite2D found in TractorBeam.")
+		push_warning(" No AnimatedSprite2D found in TractorBeam.")
 	
 	# Set up collision shape for the beam (vertical downward)
 	if collision_shape:
@@ -23,7 +23,7 @@ func _ready() -> void:
 		collision_shape.shape = shape
 		collision_shape.position = Vector2(0, beam_length / 2)  # Position downward
 	else:
-		print("Warning: No CollisionShape2D found in TractorBeam.")
+		push_warning(" No CollisionShape2D found in TractorBeam.")
 	
 	# Start lifetime timer
 	get_tree().create_timer(lifetime).timeout.connect(_on_lifetime_timeout)

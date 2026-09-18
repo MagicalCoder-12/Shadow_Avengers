@@ -21,8 +21,6 @@ extends Node
 # Create WaveConfig resources using the WaveConfig.tscn template
 # or load existing .tres files
 @export var waves: Array[WaveConfig] = []
-@export var debug_mode: bool = false
-
 # === VARIABLES ===
 var has_completed_level: bool = false
 var level_game_over: bool = false
@@ -49,6 +47,14 @@ func _ready():
 	boss_clear.hide()
 	level_game_over = GameManager.game_over
 
+	# Ensure gameplay audio mix is applied for level scenes
+	AudioManager.set_gameplay_mix(true)
+
+	# Ensure background music is playing for this level
+	var level_music: AudioStream = preload("res://Assets/Music/GameSong (mp3cut.net).mp3")
+	if not AudioManager.background_player.playing or AudioManager.current_background_music != level_music:
+		AudioManager.play_background_music(level_music, true)
+
 	# Hide banner ad when entering a level
 	if GameManager.ad_manager and GameManager.ad_manager.is_initialized:
 		GameManager.ad_manager.hide_banner_ad()
@@ -65,23 +71,15 @@ func _ready():
 			if not hud.is_connected("pause_requested", pause_requested_callable):
 				hud.connect("pause_requested", pause_requested_callable)
 
-	# Connect signals
+	# Connect signals — each check is independent so all signals get connected
 	if not GameManager.game_over_triggered.is_connected(_game_over_triggered):
 		GameManager.game_over_triggered.connect(_game_over_triggered)
-
-		
 	if not GameManager.game_paused.is_connected(_on_game_paused):
 		GameManager.game_paused.connect(_on_game_paused)
-
-		
 	if not GameManager.level_completed.is_connected(_on_level_completed):
 		GameManager.level_completed.connect(_on_level_completed)
-
-		
 	if not GameManager.shadow_mode_activated.is_connected(_on_shadow_mode_activated):
 		GameManager.shadow_mode_activated.connect(_on_shadow_mode_activated)
-
-		
 	if not GameManager.shadow_mode_deactivated.is_connected(_on_shadow_mode_deactivated):
 		GameManager.shadow_mode_deactivated.connect(_on_shadow_mode_deactivated)
 
@@ -92,7 +90,6 @@ func _ready():
 	if not wave_manager.wave_started.is_connected(_on_wave_started):
 		wave_manager.wave_started.connect(_on_wave_started)
 
-		
 	if not wave_manager.all_waves_cleared.is_connected(_on_wave_manager_all_waves_cleared):
 		wave_manager.all_waves_cleared.connect(_on_wave_manager_all_waves_cleared)
 	get_tree().get_root().connect("go_back_requested",_on_pause_pressed)
@@ -105,7 +102,6 @@ func _ready():
 	if not GameManager.level_manager.level_loaded.is_connected(_on_level_loaded):
 		GameManager.level_manager.level_loaded.connect(_on_level_loaded)
 
-	
 	# Hide wave details initially
 	_hide_wave_details_instant()
 	
@@ -156,7 +152,7 @@ func validate_wave_config(wave: WaveConfig, wave_index: int) -> bool:
 			push_warning("LevelManager: Wave %d has invalid enemy_type '%s'" % [wave_index + 1, wave.get_enemy_type_key()])
 			return false
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		var debug_string = wave.as_debug_string() if wave.has_method("as_debug_string") else "WaveConfig"
 		print("LevelManager: Validated Wave %d: %s (Boss: %s, Enemy Count: %d)" % [
 			wave_index + 1,
@@ -175,7 +171,7 @@ func _initialize_waves() -> void:
 	for i in range(waves.size()):
 		var wave = waves[i]
 		if validate_wave_config(wave, i):
-			if debug_mode:
+			if GameManager.debug_mode:
 				var debug_string = wave.as_debug_string() if wave.has_method("as_debug_string") else "WaveConfig"
 				print("LevelManager: Wave %d: Validated %s (Boss: %s, Enemy Count: %d)" % [
 					i + 1,
@@ -189,7 +185,7 @@ func _initialize_waves() -> void:
 	wave_manager.current_level = level_num
 	wave_manager.start_waves()
 	waves_initialized = true
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("LevelManager: Initialized %d waves for level %d" % [waves.size(), level_num])
 
 # === PLAYER SPAWNING ===
@@ -206,7 +202,8 @@ func _spawn_player(lives: int) -> void:
 	call_deferred("add_child", player_instance)
 	player_instance.call_deferred("set_lives", lives)
 	has_spawned_player = true
-	print("Level.gd: Spawned player with ship_id: %s with %d lives" % [GameManager.player_manager.selected_ship_id, lives])
+	if GameManager.debug_mode:
+		print("Level.gd: Spawned player with ship_id: %s with %d lives" % [GameManager.player_manager.selected_ship_id, lives])
 	
 func _check_and_spawn_player() -> void:
 	if not has_spawned_player and not get_tree().get_nodes_in_group("Player"):
@@ -223,11 +220,14 @@ func _start_campaign_tutorial() -> void:
 		TutorialManager.start_shadow_level_six()
 
 func _on_level_loaded(_level_num: int) -> void:
-	print("Level.gd: Received level_loaded signal for level %d" % _level_num)
+	if GameManager.debug_mode:
+		print("Level.gd: Received level_loaded signal for level %d" % _level_num)
 	# Hide banner ad when level is loaded
 	if GameManager.ad_manager and GameManager.ad_manager.is_initialized:
 		GameManager.ad_manager.hide_banner_ad()
-	_spawn_player(GameManager.player_lives)
+	# Guard against double spawn — _check_and_spawn_player may have already spawned
+	if not has_spawned_player:
+		_spawn_player(GameManager.player_lives)
 
 # === PAUSE TOGGLE & TWEEN ===
 func _toggle_pause_menu():
@@ -343,22 +343,19 @@ func revive_player():
 
 # === LEVEL COMPLETE ===
 func _on_level_completed(_level_num: int):
-	print("[Level Debug] _on_level_completed called with level: %d" % _level_num)
 	AudioManager.mute_bus("Bullet", true)
-	print("[Level Debug] Emitting Victory_pose signal")
 	emit_signal("Victory_pose")
 	
 	# Wait for player victory pose animation to complete before showing level completed UI
 	var player = get_tree().get_first_node_in_group("Player")
 	if player and player.has_signal("victory_pose_done"):
-		# Wait for the victory pose animation to finish
-		print("[Level Debug] Waiting for player victory_pose_done signal")
 		await player.victory_pose_done
-		print("[Level Debug] Player victory_pose_done signal received")
+		# Player may have been freed (game over) during the await.
+		if not is_inside_tree():
+			return
 
 # === WAVE CLEARED ===
 func _on_wave_manager_all_waves_cleared():
-	print("Level.gd: _on_wave_manager_all_waves_cleared called")
 	if not has_completed_level:
 		has_completed_level = true
 		if hud and hud.has_method("reset_charge"):
@@ -399,12 +396,9 @@ func _on_wave_manager_all_waves_cleared():
 
 # === BOSS DEFEATED ===
 func _on_boss_defeated() -> void:
-	print("Level.gd: _on_boss_defeated called")
 	if not GameManager.is_revive_pending:
-		print("Level.gd: Revive not pending, processing boss defeat")
 		GameManager.score += 1000
 		var current_level: int = GameManager.level_manager.get_current_level()
-		print("Level.gd: Current level is %d" % current_level)
 		
 		# Check if this is the first time completing this boss level
 		var boss_levels_completed = GameManager.save_manager.boss_levels_completed
@@ -420,42 +414,23 @@ func _on_boss_defeated() -> void:
 		print("Level.gd: Revive pending, ignoring boss defeat")
 
 func _show_boss_clear_ui():
-	print("[Level Debug] _show_boss_clear_ui called")
 	get_tree().paused = false
 	pause_menu.hide()
 	if boss_clear:
 		boss_clear.show()
-		# Initialize and show the boss clear screen
-		print("[Level Debug] Calling boss_clear.initialize()")
 		if boss_clear.has_method("initialize"):
 			boss_clear.initialize()
-			print("[Level Debug] boss_clear.initialize() called successfully")
-		else:
-			print("[Level Debug] boss_clear does not have initialize method!")
-			
-		# Show the boss clear screen and apply rewards
 		if boss_clear.has_method("show_boss_clear"):
 			boss_clear.show_boss_clear()
-			print("[Level Debug] boss_clear.show_boss_clear() called successfully")
-		else:
-			print("[Level Debug] boss_clear does not have show_boss_clear method!")
 	else:
-		# Fallback to normal level completed if boss_clear scene not available
-		print("[Level] Boss clear scene not found, showing normal level completed")
 		_show_level_completed_ui()
 
 func _show_level_completed_ui():
-	print("[Level Debug] _show_level_completed_ui called")
 	get_tree().paused = false
 	pause_menu.hide()
 	level_completed.show()
-	# Initialize the level completed screen
-	print("[Level Debug] Calling level_completed.initialize()")
 	if level_completed.has_method("initialize"):
 		level_completed.initialize()
-		print("[Level Debug] level_completed.initialize() called successfully")
-	else:
-		print("[Level Debug] level_completed does not have initialize method!")
 		
 	# Apply any rewards for subsequent boss level completions
 	var current_level_num = GameManager.level_manager.get_current_level()
@@ -492,23 +467,7 @@ func _show_level_completed_ui():
 
 # Add this new function to calculate level completion rewards
 func _calculate_level_completion_rewards(level_num_param: int) -> Dictionary:
-	# Get reward configuration
-	var reward_config = {}
-	if ConfigLoader and ConfigLoader.upgrade_settings:
-		reward_config = ConfigLoader.upgrade_settings
-	
-	# Default values if config not found
-	var base_coins = reward_config.get("level_completion_base_coins", 200)
-	var base_crystals = reward_config.get("level_completion_base_crystals", 10)
-	
-	# Calculate rewards based on level number with diminishing returns
-	# Using square root to provide growth that slows over time
-	var level_multiplier = pow(float(level_num_param), 0.75)
-	
-	return {
-		"coins": int(base_coins * level_multiplier),
-		"crystals": int(base_crystals * level_multiplier)
-	}
+	return GameManager.calculate_level_completion_rewards(level_num_param)
 
 # === SHADOW MODE ===
 func _on_shadow_mode_activated():
@@ -520,7 +479,7 @@ func _on_shadow_mode_deactivated():
 # === WAVE DETAILS UI ===
 func _on_wave_started(current_wave: int, total_waves_count: int) -> void:
 	"""Show wave details UI when a new wave starts"""
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Level: Wave started - %d/%d" % [current_wave, total_waves_count])
 	
 	_show_wave_details(current_wave, total_waves_count)
@@ -528,7 +487,7 @@ func _on_wave_started(current_wave: int, total_waves_count: int) -> void:
 func _show_wave_details(current_wave: int, total_waves_count: int) -> void:
 	"""Display wave details with fade-in animation and auto-hide after duration"""
 	if not wave_details or not level_label or not total_waves_label:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("Level: Wave details UI nodes not found")
 		return
 	
@@ -568,28 +527,13 @@ func _hide_wave_details_instant() -> void:
 		wave_details_container.modulate.a = 0.0
 
 func handle_node_added(node: Node) -> void:
-	print("Level.gd: handle_node_added called for node: %s" % node.name)
-	if node.is_in_group("Boss"):
-		print("Level.gd: New boss node added: %s" % node.name)
-		if node.has_signal("boss_defeated"):
-			print("Level.gd: Boss node has boss_defeated signal")
-			if not node.boss_defeated.is_connected(_on_boss_defeated):
-				node.boss_defeated.connect(_on_boss_defeated)
-				print("Level.gd: Connected boss_defeated signal")
-			else:
-				print("Level.gd: boss_defeated signal already connected")
-		else:
-			print("Level.gd: Boss node does not have boss_defeated signal")
-	
-	# Also connect to LevelManager's boss_defeated signal for boss waves spawned by WaveManager
+	# Connect to LevelManager's boss_defeated signal for all boss waves.
+	# LevelManager emits this for both direct boss nodes and WaveManager-spawned bosses.
 	if node is WaveManager:
-		# Connect to the boss defeated signal from LevelManager
 		if not GameManager.level_manager.boss_defeated.is_connected(_on_level_manager_boss_defeated):
 			GameManager.level_manager.boss_defeated.connect(_on_level_manager_boss_defeated)
-			print("Level.gd: Connected LevelManager boss_defeated signal")
 
 func _on_level_manager_boss_defeated() -> void:
-	print("Level.gd: _on_level_manager_boss_defeated called")
 	# This is called when a boss is defeated through LevelManager
 	# Show the appropriate screen based on whether it's the first time completing this boss level
 	var current_level: int = GameManager.level_manager.get_current_level()
@@ -604,13 +548,14 @@ func _on_level_manager_boss_defeated() -> void:
 		_show_level_completed_ui()
 
 func _input(event):
-	if debug_mode and event.is_action_pressed("debug_next_level"):
+	if GameManager.debug_mode and event.is_action_pressed("debug_next_level"):
 		_unlock_next_level_debug()
 	if event.is_action_pressed("dev_win"):
 		_dev_win()
 
 func _unlock_next_level_debug():
-	print("Debug: Unlocking next level")
+	if GameManager.debug_mode:
+		print("Debug: Unlocking next level")
 	var current_level = GameManager.level_manager.get_current_level()
 	GameManager.level_manager.unlock_next_level(current_level)
 

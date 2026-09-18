@@ -27,13 +27,13 @@ var _lifetime_timer: float = 0.0
 
 func _ready() -> void:
 	if speed <= 0:
-		print("Warning: HomingBullet speed is non-positive. Setting to 300.0.")
+		push_warning(" HomingBullet speed is non-positive. Setting to 300.0.")
 		speed = 300.0
 	if damage <= 0:
-		print("Warning: HomingBullet damage is non-positive. Setting to 1.")
+		push_warning(" HomingBullet damage is non-positive. Setting to 1.")
 		damage = 1
 	if turn_rate < 0.0 or turn_rate > 1.0:
-		print("Warning: HomingBullet turn_rate out of range. Setting to 0.05.")
+		push_warning(" HomingBullet turn_rate out of range. Setting to 0.05.")
 		turn_rate = 0.05
 	
 	# Find the player for homing
@@ -69,7 +69,7 @@ func set_target(pos: Vector2) -> void:
 ## Sets the lifetime of the bullet in seconds.
 func set_lifetime(time: float) -> void:
 	if time < 0.0:
-		print("Warning: HomingBullet lifetime cannot be negative. Setting to 0.0.")
+		push_warning(" HomingBullet lifetime cannot be negative. Setting to 0.0.")
 		lifetime = 0.0
 	else:
 		lifetime = time
@@ -82,7 +82,7 @@ func get_damage() -> int:
 ## Sets the damage value of the bullet.
 func set_damage(new_damage: int) -> void:
 	if new_damage <= 0:
-		print("Warning: HomingBullet damage is non-positive. Setting to 1.")
+		push_warning(" HomingBullet damage is non-positive. Setting to 1.")
 		damage = 1
 	else:
 		damage = new_damage

@@ -1,6 +1,7 @@
 extends Control
 
 const INTERN_MENU = "res://MainScenes/Intern_Menu.tscn"
+const TUTORIAL_LEVEL = "res://Levels/level_0.tscn"
 const Credits = "res://MainScenes/credits.tscn"
 @onready var exit_panel: Panel = $Exit_panel
 var _exit_tween: Tween
@@ -14,7 +15,10 @@ func _ready() -> void:
 
 	
 func _on_start_button_pressed() -> void:
-	GameManager.change_scene(INTERN_MENU)
+	if LevelManager.completed_levels.has(0):
+		GameManager.change_scene(INTERN_MENU)
+	else:
+		GameManager.change_scene(TUTORIAL_LEVEL)
 
 
 func _on_exit_pressed() -> void:

@@ -396,11 +396,20 @@ func _perform_spin() -> void:
 	var steps: int = loops * reward_panels.size() + target_index
 	var delay: float = SPIN_START_DELAY
 	for step in range(steps + 1):
+		if not is_inside_tree():
+			_spin_in_progress = false
+			return
 		_highlight_panel(step % reward_panels.size())
 		await get_tree().create_timer(delay, true).timeout
 		delay = min(delay + SPIN_DELAY_STEP, SPIN_MAX_DELAY)
+	if not is_inside_tree():
+		_spin_in_progress = false
+		return
 	_showcase_selected_panel(target_index)
 	await get_tree().create_timer(RESULT_SHOWCASE_DURATION, true).timeout
+	if not is_inside_tree():
+		_spin_in_progress = false
+		return
 	_apply_reward(reward_panels[target_index])
 	_spin_in_progress = false
 	_start_idle_glow()

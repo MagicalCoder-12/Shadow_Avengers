@@ -92,6 +92,7 @@ const SATELLITE_ASCENSION_THRESHOLDS: Dictionary = {
 }
 
 # Debug/Developer settings
+@export var debug_mode: bool = false  # Centralized debug flag — all scripts should reference this
 var enable_dev_win: bool = true  # Debug utility: allow instant level completion with "W" key
 @export var allow_god_mode: bool = true
 const GOD_MODE_DAMAGE_MULTIPLIER: int = 10
@@ -425,9 +426,12 @@ func _on_shadow_mode_timer_timeout() -> void:
 	request_shadow_mode_deactivate("_on_shadow_mode_timer_timeout")
 
 func _on_node_added(node: Node) -> void:
-	level_manager.handle_node_added(node)
-	ad_manager.handle_node_added(node)
-	scene_manager.handle_node_added(node)
+	# Only dispatch to handlers that care about this node type.
+	if node is WaveManager or node.is_in_group("Boss"):
+		level_manager.handle_node_added(node)
+	if node is Control:
+		ad_manager.handle_node_added(node)
+		scene_manager.handle_node_added(node)
 
 func connect_score_signals(target_node: Node) -> void:
 	if target_node.has_method("set_score"):
@@ -776,6 +780,16 @@ func reset_level_currencies() -> void:
 	coins_collected_this_level = 0
 	crystals_collected_this_level = 0
 
+## Shared level completion reward calculation.
+func calculate_level_completion_rewards(level_num: int) -> Dictionary:
+	var base_coins = get_upgrade_setting("level_completion_base_coins", 200)
+	var base_crystals = get_upgrade_setting("level_completion_base_crystals", 10)
+	var level_multiplier = pow(float(level_num), 0.75)
+	return {
+		"coins": int(base_coins * level_multiplier),
+		"crystals": int(base_crystals * level_multiplier)
+	}
+
 # New function to pause the game during ad revive
 func pause_for_ad_revive() -> void:
 	if not game_over or level_manager.is_level_just_completed:
@@ -790,19 +804,8 @@ func resume_after_ad_revive() -> void:
 
 
 # Handle revive completion signal
-func _on_revive_completed(success: bool) -> void:
+func _on_revive_completed(_success: bool) -> void:
 	resume_after_ad_revive()
-	if success:
-		print("[GameManager]: Revive completed successfully")
-	else:
-		print("[GameManager]: Revive failed or was cancelled")
-
-# Add this method to handle level selection from the map
-func _on_level_selected(level_num: int) -> void:
-	if is_level_unlocked(level_num):
-		load_level(level_num)
-	else:
-		print("[GameManager]: Level %d is locked" % level_num)
 
 # Notify when ship stats are updated
 func notify_ship_stats_updated(ship_id: String, new_damage: int) -> void:

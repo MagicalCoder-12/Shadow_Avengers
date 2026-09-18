@@ -73,10 +73,11 @@ func _pattern_phase_1_arc_volley() -> void:
 			var fire_position := marker.global_position
 			var base_direction := _get_player_direction(fire_position)
 			await _show_muzzle_flash_and_wait(fire_position)
+			if not is_inside_tree(): break
 			for angle_offset in [-0.3, 0.0, 0.3]:
 				spawn_bullet(HELL_PATTERN_SCENE, fire_position, base_direction.rotated(angle_offset), 560.0, boss_bullet_damage_phase_1, 5.0)
 		if burst < 1:
-			await get_tree().create_timer(pattern_pause_medium).timeout
+			if not await _await_boss_timer(pattern_pause_medium): break
 	finish_pattern_execution()
 
 func _pattern_phase_1_orb_barrage() -> void:
@@ -85,10 +86,11 @@ func _pattern_phase_1_orb_barrage() -> void:
 
 	for angle_offset in [-0.24, 0.0, 0.24]:
 		await _show_muzzle_flash_and_wait(fire_position)
+		if not is_inside_tree(): break
 		var orb := spawn_bullet(ENERGY_BALL_SCENE, fire_position, base_direction.rotated(angle_offset), 350.0, boss_bullet_damage_phase_1, 5.0)
 		if orb and orb.has_method("set_speed"):
 			orb.set_speed(350.0)
-		await get_tree().create_timer(pattern_pause_short).timeout
+		if not await _await_boss_timer(pattern_pause_short): break
 	finish_pattern_execution()
 
 func _pattern_phase_2_split_ring() -> void:
@@ -105,7 +107,9 @@ func _pattern_phase_2_split_ring() -> void:
 			continue
 		spawn_bullet(HELL_PATTERN_SCENE, fire_position, Vector2.RIGHT.rotated(angle), 690.0, boss_bullet_damage_phase_2, 5.5)
 
-	await get_tree().create_timer(pattern_pause_medium).timeout
+	if not await _await_boss_timer(pattern_pause_medium):
+		finish_pattern_execution()
+		return
 	var follow_up_direction := _get_player_direction(fire_position)
 	var energy_ball := spawn_bullet(ENERGY_BALL_SCENE, fire_position, follow_up_direction, 430.0, boss_bullet_damage_phase_2, 4.8)
 	if energy_ball and energy_ball.has_method("set_speed"):
@@ -120,13 +124,17 @@ func _pattern_phase_2_hunter_crossfire() -> void:
 		var fire_position := marker.global_position
 		var aim_direction := _get_player_direction(fire_position)
 		await _show_muzzle_flash_and_wait(fire_position)
+		if not is_inside_tree(): break
 		for volley_index in range(2):
 			var homing := spawn_bullet(HOMING_BULLET_SCENE, fire_position, aim_direction.rotated(-0.08 + volley_index * 0.16), 470.0, boss_bullet_damage_phase_2, 4.3)
 			if homing and homing.has_method("set_turn_rate"):
 				homing.set_turn_rate(0.028)
-		await get_tree().create_timer(pattern_pause_short).timeout
+		if not await _await_boss_timer(pattern_pause_short): break
 
 	await _show_muzzle_flash_and_wait(center_fire_position)
+	if not is_inside_tree():
+		finish_pattern_execution()
+		return
 	var center_direction := _get_player_direction(center_fire_position)
 	for angle_offset in [-0.28, -0.14, 0.0, 0.14, 0.28]:
 		spawn_bullet(HELL_PATTERN_SCENE, center_fire_position, center_direction.rotated(angle_offset), 720.0, boss_bullet_damage_phase_2, 5.0)

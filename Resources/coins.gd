@@ -105,7 +105,8 @@ func _on_area_entered(area: Area2D) -> void:
 	animated_sprite_2d.show()
 	animated_sprite_2d.play("collected")
 	await get_tree().create_timer(_get_collection_effect_duration()).timeout
-	queue_free()
+	if is_inside_tree():
+		queue_free()
 
 func _on_lifespan_timeout() -> void:
 	# Queue free the coin after lifespan expires

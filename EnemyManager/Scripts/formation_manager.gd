@@ -15,7 +15,6 @@ signal all_enemies_destroyed
 signal all_enemies_spawned
 signal enemy_died(enemy: Enemy)
 
-@export var debug_mode: bool = false
 @export var formation_completion_delay: float = 0.5
 
 # New export for spawn point indicator
@@ -76,7 +75,7 @@ func _ready():
 func reset() -> void:
 	_clear_formation_data()
 	is_spawning = false
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Reset state")
 
 func spawn_formation(config: WaveConfig) -> void:
@@ -123,7 +122,7 @@ func spawn_formation(config: WaveConfig) -> void:
 		formation_complete.emit()
 		return
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Starting formation spawn:")
 		print("  Type: ", FormationEnums.FormationType.keys()[current_wave_config.formation_type])
 		print("  Pattern: ", FormationEnums.EntryPattern.keys()[current_wave_config.entry_pattern])
@@ -183,7 +182,7 @@ func _calculate_formation_positions(enemy_count: int) -> void:
 		var fallback_pos = formation_center + Vector2(randf_range(-50, 50), randf_range(-50, 50))
 		formation_positions.append(fallback_pos)
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Generated ", formation_positions.size(), " formation positions")
 
 # --- New Formation Calculation Methods ---
@@ -285,7 +284,7 @@ func _calculate_spawn_positions(enemy_count: int) -> void:
 	
 	var entry_pattern = current_wave_config.get_entry_pattern()
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Calculating spawn positions for pattern: ", FormationEnums.EntryPattern.keys()[entry_pattern])
 	
 	match entry_pattern:
@@ -313,10 +312,10 @@ func _calculate_spawn_positions(enemy_count: int) -> void:
 	while spawn_positions.size() < enemy_count:
 		var fallback_pos = Vector2(screen_width/2 + randf_range(-200, 200), -SPAWN_BUFFER)
 		spawn_positions.append(fallback_pos)
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Added fallback spawn position %d" % spawn_positions.size())
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Generated ", spawn_positions.size(), " spawn positions")
 
 # --- New Entry Position Calculation Methods ---
@@ -464,7 +463,7 @@ func _calculate_entry_paths(enemy_count: int) -> void:
 		var simple_path = [Vector2(screen_width/2, -SPAWN_BUFFER), Vector2(screen_width/2, 200)]
 		entry_paths.append(simple_path)
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Generated ", entry_paths.size(), " entry paths")
 
 func _create_entry_path(spawn_pos: Vector2, target_pos: Vector2) -> Array[Vector2]:
@@ -621,7 +620,7 @@ func _spawn_enemies_sequence(enemy_count: int) -> void:
 	var multipliers = difficulty_multipliers[difficulty]
 	var adjusted_spawn_delay = spawn_delay * multipliers["spawn_delay"]
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Starting to spawn ", enemy_count, " enemies")
 	
 	# Show spawn indicators before spawning enemies
@@ -633,12 +632,14 @@ func _spawn_enemies_sequence(enemy_count: int) -> void:
 		_spawn_single_enemy(i)
 		enemies_spawned_count += 1
 		
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Spawned enemy ", i+1, "/", enemy_count)
 		
 		if adjusted_spawn_delay > 0 and i < enemy_count - 1:
 			if get_tree():
 				await get_tree().create_timer(adjusted_spawn_delay).timeout
+				if not is_instance_valid(self):
+					return  # FormationManager was freed during spawn delay
 			else:
 				push_warning("FormationManager: Cannot create spawn delay timer, not in scene tree")
 	
@@ -646,7 +647,7 @@ func _spawn_enemies_sequence(enemy_count: int) -> void:
 	all_enemies_have_spawned = true
 	all_enemies_spawned.emit()
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: All enemies spawned")
 
 func _spawn_single_enemy(index: int) -> void:
@@ -669,7 +670,7 @@ func _spawn_single_enemy(index: int) -> void:
 	var level_selection_manager = get_node("/root/LevelSelectionManager")
 	if level_selection_manager and level_selection_manager.selected_difficulty != null:
 		enemy.current_difficulty = level_selection_manager.selected_difficulty
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Set enemy difficulty to %s" % FormationEnums.DifficultyLevel.keys()[level_selection_manager.selected_difficulty])
 	
 	# Ensure we have valid positions
@@ -714,7 +715,7 @@ func _spawn_single_enemy(index: int) -> void:
 	
 	enemy_spawned.emit(enemy)
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Spawned enemy %d at %s" % [index, enemy.global_position])
 
 func _setup_enemy_formation_data(enemy: Enemy, index: int) -> void:
@@ -790,7 +791,7 @@ func _on_tree_exiting() -> void:
 
 func _on_enemy_formation_reached(enemy: Enemy) -> void:
 	if not is_instance_valid(enemy):
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Formation reached signal for invalid enemy")
 		return
 	
@@ -799,7 +800,7 @@ func _on_enemy_formation_reached(enemy: Enemy) -> void:
 	
 	enemies_reached_formation[enemy] = true
 	enemies_in_formation += 1
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: Enemy reached formation. Total: %d" % enemies_in_formation)
 	
 	if enemies_in_formation >= spawned_enemies.size() and is_spawning:
@@ -817,20 +818,21 @@ func _check_formation_complete() -> void:
 			await get_tree().create_timer(formation_completion_delay).timeout
 		else:
 			push_warning("FormationManager: Cannot create completion delay timer, not in scene tree")
-		formation_complete.emit()
-		if debug_mode:
+		if is_instance_valid(self):
+			formation_complete.emit()
+		if GameManager.debug_mode:
 			print("FormationManager: Formation complete")
 
 func _on_enemy_died(enemy: Enemy) -> void:
 	if not is_instance_valid(enemy):
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Died signal received for invalid enemy")
 		return
 	
 	if enemies_reached_formation.has(enemy):
 		enemies_reached_formation.erase(enemy)
 		enemies_in_formation = max(0, enemies_in_formation - 1)
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: Enemy died (was in formation). Formation count: %d" % enemies_in_formation)
 	
 	# Remove from spawned_enemies
@@ -842,7 +844,7 @@ func _on_enemy_died(enemy: Enemy) -> void:
 	if alive_enemies == 0 and all_enemies_have_spawned:
 		all_enemies_destroyed.emit()
 		is_spawning = false
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("FormationManager: All enemies destroyed")
 
 func get_alive_enemy_count() -> int:
@@ -859,11 +861,11 @@ func destroy_all_enemies() -> void:
 		if is_instance_valid(enemy):
 			enemy.queue_free()
 	_clear_formation_data()
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("FormationManager: All enemies destroyed")
 
 func _draw() -> void:
-	if not debug_mode:
+	if not GameManager.debug_mode:
 		return
 	
 	# Draw formation positions

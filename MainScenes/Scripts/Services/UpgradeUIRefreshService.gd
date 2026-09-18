@@ -148,7 +148,8 @@ func update_current_satellite_textures(game_manager) -> void:
 	for satellite in satellites:
 		if satellite and satellite.has_method("_load_satellite_data"):
 			satellite._load_satellite_data()
-			print("Updated satellite texture for: ", satellite.name)
+			if GameManager.debug_mode:
+				print("Updated satellite texture for: ", satellite.name)
 
 	var player = current_scene.get_node_or_null("Player")
 	if not player:
@@ -162,7 +163,8 @@ func update_current_satellite_textures(game_manager) -> void:
 			for child in player_sprite.get_children():
 				if child.name.begins_with("Satellite") and child.has_method("_load_satellite_data"):
 					child._load_satellite_data()
-					print("Updated satellite texture for: ", child.name)
+					if GameManager.debug_mode:
+						print("Updated satellite texture for: ", child.name)
 
 	await tree.process_frame
 	for satellite in satellites:

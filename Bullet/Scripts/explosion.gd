@@ -78,4 +78,5 @@ func _cleanup() -> void:
 	if _is_cleaning_up:
 		return
 	_is_cleaning_up = true
-	queue_free()
+	if is_inside_tree():
+		queue_free()

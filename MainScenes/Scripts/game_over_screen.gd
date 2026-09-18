@@ -223,15 +223,10 @@ func _on_restart_pressed() -> void:
 
 # Logs debug messages if enabled in Player.gd
 func _debug_log(message: String) -> void:
-	var player: Node = get_tree().get_first_node_in_group("Player")
-	if player and player is Player and player.enable_debug_logging:
+	if GameManager.debug_mode:
 		print("[GameOverScreen Debug] " + message)
 
 
-func _on_shop_button_down() -> void:
-	if GameManager:
-		GameManager.reset_game()
-	GameManager.change_scene(SHOP_SCENE)
 
 
 func _on_crystal_revive_pressed() -> void:
@@ -273,5 +268,5 @@ func _show_temp_message(text: String, duration: float = 3.0) -> void:
 	message_label.text = text
 	message_label.visible = true
 	await get_tree().create_timer(duration).timeout
-	if message_label and current_token == _message_token:
+	if is_inside_tree() and message_label and current_token == _message_token:
 		_set_default_message()

@@ -79,21 +79,16 @@ func _show_difficulty_selection() -> void:
 	while current_node and current_node.name != "Map":
 		current_node = current_node.get_parent()
 		if not current_node:
-			print("Level button: Could not find Map node in parent hierarchy")
 			return
-	
-	print("Level button: Found Map node through parent traversal")
 	
 	# Find the difficulty selection panel
 	if current_node.has_node("CanvasLayer/DifficultySelection"):
 		var difficulty_panel = current_node.get_node("CanvasLayer/DifficultySelection")
-		print("Level button: Found difficulty selection panel")
-		
+
 		# Set the target level
 		if difficulty_panel.has_method("set_target_level"):
 			difficulty_panel.set_target_level(level_num)
-			print("Level button: Set target level to ", level_num)
-		
+
 		# Show the canvas layer and difficulty selection panel
 		if current_node.has_node("CanvasLayer"):
 			var canvas_layer = current_node.get_node("CanvasLayer")
@@ -102,7 +97,6 @@ func _show_difficulty_selection() -> void:
 		
 			difficulty_panel.show()
 			difficulty_panel.visible = true
-			print("Level button: Showed difficulty selection panel")
 			
 			# Bring the panel to the front to ensure it's visible
 			if difficulty_panel is Control:
@@ -126,5 +120,3 @@ func _show_difficulty_selection() -> void:
 			if panel_control.focus_mode == Control.FOCUS_NONE:
 				panel_control.focus_mode = Control.FOCUS_ALL
 			panel_control.grab_focus()
-		else:
-			print("Level button: Difficulty selection panel not found at CanvasLayer/DifficultySelection")

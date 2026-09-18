@@ -8,8 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://c5met1im8s2k4" path="res://Assets/Satellite/Sat_textures/Sat5.png" id="5_mt7u5"]
 [ext_resource type="Texture2D" uid="uid://bghegjllovrjq" path="res://Assets/Boss/B1.png" id="6_2hkns"]
 [ext_resource type="PackedScene" uid="uid://db76ybegj7ain" path="res://MainScenes/wheel.tscn" id="6_8w1gi"]
-[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Assets/UI/Main_Menu/BTNs/Backward_BTN.png" id="9_aue4b"]
-[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Assets/UI/Main_Menu/BTNs_Active/Backward_BTN.png" id="10_nlsn1"]
+[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Backward_BTN.png" id="9_aue4b"]
+[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png" id="10_nlsn1"]
 [ext_resource type="PackedScene" uid="uid://cm88dqm28c6tb" path="res://UI/TutorialOverlay.tscn" id="11_nlsn1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wtw7j"]

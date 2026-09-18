@@ -134,9 +134,6 @@ func _process(delta: float):
 func start_timer():
 	elapsed_time = 0.0
 
-func stop_timer():
-	pass  # No longer needed with accumulated delta
-
 func reset_timer():
 	elapsed_time = 0.0
 

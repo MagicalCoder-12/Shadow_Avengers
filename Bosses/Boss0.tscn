@@ -4,12 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://nhpymmsystt2" path="res://Bullet/Boss_bullet/homing_bullet.tscn" id="2_uo67q"]
 [ext_resource type="Texture2D" uid="uid://bna0irko30tcn" path="res://Assets/Boss/oldBossGFX/oldSERPENTARIUS2.png" id="3_lya23"]
 [ext_resource type="PackedScene" uid="uid://dwwtn28ag05fi" path="res://UI/HealthBar.tscn" id="4_uo67q"]
-[ext_resource type="Texture2D" uid="uid://bbnphfgxxxjn6" path="res://Assets/UI/Main_Menu/Boss_HP_Table.png" id="5_oe4f5"]
+[ext_resource type="Texture2D" uid="uid://bbnphfgxxxjn6" path="res://Autoloads/Scripts/Main_Menu/Boss_HP_Table.png" id="5_oe4f5"]
 [ext_resource type="AudioStream" uid="uid://ywr4cb2khhyc" path="res://Assets/Music/BossOpressorDeath.wav" id="6_etykq"]
 [ext_resource type="Texture2D" uid="uid://vww23vh7ph4p" path="res://Assets/Lasers/explosion.png" id="6_ri1nu"]
-[ext_resource type="Texture2D" uid="uid://hcsvihieifv7" path="res://Assets/UI/Main_Menu/Boss_HP_Bar_2.png" id="6_xjoeo"]
+[ext_resource type="Texture2D" uid="uid://hcsvihieifv7" path="res://Autoloads/Scripts/Main_Menu/Boss_HP_Bar_2.png" id="6_xjoeo"]
 [ext_resource type="AudioStream" uid="uid://d0hou0ybwsa1p" path="res://Assets/Music/monster_60_attack.wav" id="8_rkkp3"]
-
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gnr7p"]
 size = Vector2(363, 504)

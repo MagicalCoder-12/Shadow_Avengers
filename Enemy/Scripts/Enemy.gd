@@ -34,7 +34,7 @@ signal shadow_state_changed(is_shadow: bool)
 @export var max_health: int = 200
 @export var damage_amount: int = 1
 @export var speed: float = 200.0
-@export var debug_mode: bool = false
+
 @export var shadow_spawn_probability: float = 0.3
 @export var shadow_health_multiplier: float = 1.5
 @export var shadow_score_multiplier: float = 2.0
@@ -106,6 +106,10 @@ var difficulty_multipliers: Dictionary = {
 # --- Movement Behavior ---
 var movement_pattern: int = ENEMY_MOVEMENT_SERVICE_SCRIPT.MOVE_FORMATION_HOLD
 
+# Static cache shared across all Enemy instances to avoid redundant JSON reads.
+static var _shared_profiles: Dictionary = {}
+static var _shared_profiles_loaded: bool = false
+
 var enemy_type_profiles: Dictionary = {}
 
 # --- Core State Variables ---
@@ -176,26 +180,36 @@ func _ready():
 	# Initialize new movement pattern variables
 	_init_movement_patterns()
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Enemy spawned: ", enemy_type)
 
 func _load_enemy_type_profiles() -> void:
-	enemy_type_profiles.clear()
+	# Use the shared static cache if already loaded.
+	if _shared_profiles_loaded and not _shared_profiles.is_empty():
+		enemy_type_profiles = _shared_profiles
+		return
+
+	var profiles: Dictionary = {}
 	if ConfigLoader and ConfigLoader.enemy_profiles is Dictionary:
 		var config_profiles: Dictionary = ConfigLoader.enemy_profiles as Dictionary
 		if not config_profiles.is_empty():
-			enemy_type_profiles = config_profiles.duplicate(true)
+			profiles = config_profiles.duplicate(true)
 
-	if enemy_type_profiles.is_empty():
-		enemy_type_profiles = _load_enemy_profiles_from_path("res://data/enemy_profiles.json")
-	if enemy_type_profiles.is_empty():
-		enemy_type_profiles = _load_enemy_profiles_from_path("res://data/defaults/enemy_profiles.v1.json")
+	if profiles.is_empty():
+		profiles = _load_enemy_profiles_from_path("res://data/enemy_profiles.json")
+	if profiles.is_empty():
+		profiles = _load_enemy_profiles_from_path("res://data/defaults/enemy_profiles.v1.json")
 
-	if enemy_type_profiles.is_empty():
+	if profiles.is_empty():
 		push_error("Enemy: enemy_profiles is empty. Falling back to exported stat defaults.")
 
+	# Populate the shared cache for all future Enemy instances.
+	_shared_profiles = profiles
+	_shared_profiles_loaded = true
+	enemy_type_profiles = profiles
+
 func _ensure_enemy_profiles_loaded() -> void:
-	if enemy_type_profiles.is_empty():
+	if not _shared_profiles_loaded or enemy_type_profiles.is_empty():
 		_load_enemy_type_profiles()
 
 func _load_enemy_profiles_from_path(path: String) -> Dictionary:
@@ -233,7 +247,7 @@ func _load_movement_settings_from_config():
 	movement_service.load_movement_settings_from_config()
 
 func _on_tree_exiting():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Enemy: Tree exiting - cleaning up")
 	_disconnect_all_signals()
 	
@@ -250,22 +264,21 @@ func _connect_signals():
 		# Only connect screen_entered if not already connected
 		if not visible_on_screen_notifier_2d.is_connected("screen_entered", _on_visible_on_screen_notifier_2d_screen_entered):
 			visible_on_screen_notifier_2d.screen_entered.connect(_on_visible_on_screen_notifier_2d_screen_entered)
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("Boss: Connected screen_entered signal")
 		else:
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("Boss: Skipped connecting screen_entered signal - already connected")
 		
 		# Only connect screen_exited if not already connected
 		if not visible_on_screen_notifier_2d.is_connected("screen_exited", _on_visible_on_screen_notifier_2d_screen_exited):
 			visible_on_screen_notifier_2d.screen_exited.connect(_on_visible_on_screen_notifier_2d_screen_exited)
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("Boss: Connected screen_exited signal")
 		else:
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("Boss: Skipped connecting screen_exited signal - already connected")
 	
-
 func _disconnect_all_signals():
 	lifecycle_service.disconnect_all_signals()
 
@@ -335,7 +348,7 @@ func setup_formation_entry(config: WaveConfig, index: int, formation_pos: Vector
 	
 	spawn_position = position
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Enemy formation setup complete")
 
 func _apply_enemy_profile(profile_key: String) -> void:
@@ -380,7 +393,7 @@ func set_entry_path(path: Array[Vector2]):
 	entry_path = path
 	entry_path_index = 0
 	
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("Entry path set with ", path.size(), " waypoints")
 
 func assign_formation_slot(data: Dictionary) -> void:
@@ -473,7 +486,6 @@ func on_shadow_mode_changed(active: bool) -> void:
 
 func on_shadow_mode_unlocked_changed(unlocked: bool) -> void:
 	shadow_mode_unlocked = unlocked
-
 
 func _on_area_entered(area: Area2D) -> void:
 	lifecycle_service.handle_area_entered(area)

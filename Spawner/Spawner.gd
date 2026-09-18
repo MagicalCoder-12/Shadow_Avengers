@@ -72,9 +72,9 @@ func _on_PowerupSpawnTimer_timeout() -> void:
 		powerupSpawnTimer.stop()
 		return
 	
-		# Weighted random selection:
+	# Weighted random selection:
 	# - Asteroid: 50%
-	# - Attack Boost (powerup): 25%
+	# - Attack Boost: 25%
 	# - Super Mode: 15%
 	# - Health: 10%
 	var roll = randf() * 100  # Random number between 0 and 100
@@ -82,10 +82,10 @@ func _on_PowerupSpawnTimer_timeout() -> void:
 	var is_astroid = false
 	
 	if roll < 50:
-		selected_scene = powerup_scenes[2]  # Attack Boost
-	elif roll < 75:
-		selected_scene = powerup_scenes[0]  # Asteroid
+		selected_scene = powerup_scenes[2]  # Asteroid
 		is_astroid = true
+	elif roll < 75:
+		selected_scene = powerup_scenes[0]  # Attack Boost
 	elif roll < 90:
 		selected_scene = powerup_scenes[1]  # Super Mode
 	else:

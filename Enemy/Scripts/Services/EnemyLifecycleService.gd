@@ -71,7 +71,7 @@ func set_shadow_alpha(alpha: float) -> void:
 func on_shadow_mode_activated() -> void:
 	if not _enemy:
 		return
-	if _enemy.debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow mode activated for enemy")
 	if not _enemy.is_shadow_enemy:
 		_enemy._make_shadow_enemy()
@@ -90,7 +90,7 @@ func on_shadow_mode_activated() -> void:
 func on_shadow_mode_deactivated() -> void:
 	if not _enemy:
 		return
-	if _enemy.debug_mode:
+	if GameManager.debug_mode:
 		print("Shadow mode deactivated for enemy")
 	if _enemy.fire_timer:
 		_enemy.fire_timer.wait_time = 1.0 / _enemy.fire_rate

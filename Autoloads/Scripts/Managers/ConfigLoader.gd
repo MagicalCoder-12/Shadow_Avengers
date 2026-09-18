@@ -194,11 +194,11 @@ func _get_default_player_settings() -> Dictionary:
 		"shadow_fire_delay_multiplier": 0.1,
 		"spread_angle_increment": 10.0,
 		"spawn_point_offset": 5.0,
-		"super_mode_damage_boost": 2.0,
-		"super_mode_speed_multiplier": 2.0,
+		"super_mode_damage_boost": 1.5,
+		"super_mode_speed_multiplier": 1.5,
 		"super_mode_fire_delay": 0.15,
 		"super_mode_bullet_speed": 5000.0,
-		"shadow_bullet_count": 25,
+		"shadow_bullet_count": 20,
 		"base_bullet_damage": 20,
 		"shadow_texture": "res://Assets/player/g-01.png"
 	}
@@ -318,31 +318,3 @@ func _is_type_compatible(schema_value: Variant, data_value: Variant, context: St
 
 func _is_number(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
-
-func _save_json_file(path: String, data: Variant) -> void:
-	"""
-	Saves data to a JSON file with schema version information.
-	"""
-	var data_to_save: Variant = data
-	
-	if data is Dictionary:
-		data_to_save = data.duplicate()
-		data_to_save["schema_version"] = CONFIG_SCHEMA_VERSION
-	elif data is Array:
-		data_to_save = {
-			"schema_version": CONFIG_SCHEMA_VERSION,
-			"items": data
-		}
-	else:
-		data_to_save = {
-			"schema_version": CONFIG_SCHEMA_VERSION,
-			"data": data
-		}
-	
-	var file = FileAccess.open(path, FileAccess.WRITE)
-	if file:
-		var json_string = JSON.stringify(data_to_save, "\t")
-		file.store_string(json_string)
-		file.close()
-	else:
-		push_error("Could not write to JSON file at path: %s" % path)

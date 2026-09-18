@@ -7,7 +7,6 @@ const LOADER_SCENE: PackedScene = preload("res://Autoloads/screen_loader.tscn")
 const MAP_SCENE: String = "res://Map/map.tscn"
 const START_SCREEN_SCENE: String = "res://MainScenes/start_menu.tscn"
 const UPGRADE_MENU: String = "res://MainScenes/upgrade_menu.tscn"
-#const VIDEO_SCENE: String = "res://UI/VideoPlayback.tscn"
 const BACKGROUND_MUSIC: AudioStream = preload("res://Assets/Music/Start.ogg")
 
 func _ready() -> void:

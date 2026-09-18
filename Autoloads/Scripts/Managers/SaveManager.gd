@@ -506,16 +506,6 @@ func _exit_tree() -> void:
 		_save_timer.stop()
 	save_progress(true)
 
-# Add functions to save and get per-level data
-
-func get_level_score(_level_num: int) -> int:
-	# Always return 0 as scores start from 0 for each level
-	return 0
-
-func get_level_lives(_level_num: int) -> int:
-	# Always return 3 as lives start from 3 for each level
-	return 3
-
 # Add functions for level completion count tracking
 func get_level_completion_count(level_num: int) -> int:
 	return level_completion_counts.get(level_num, 0)
@@ -646,7 +636,6 @@ func _get_default_satellites() -> Array:
 # Mark a level as completed in a specific difficulty
 # Also tracks highest difficulty completed for that level
 func mark_level_completed_in_difficulty(level_num: int, difficulty: String) -> void:
-	print("SaveManager: mark_level_completed_in_difficulty called - level=%d, difficulty=%s" % [level_num, difficulty])
 	
 	var difficulty_value = 0
 	match difficulty:
@@ -657,8 +646,10 @@ func mark_level_completed_in_difficulty(level_num: int, difficulty: String) -> v
 				# Check if Level 10 Easy is completed to unlock Normal globally
 				if level_num == 10:
 					normal_globally_unlocked = true
-					print("SaveManager: NORMAL GLOBALLY UNLOCKED (Level 10 Easy completed)")
-				print("SaveManager: Level %d marked as completed in Easy" % level_num)
+					if gm.debug_mode:
+						print("SaveManager: NORMAL GLOBALLY UNLOCKED (Level 10 Easy completed)")
+				if gm.debug_mode:
+					print("SaveManager: Level %d marked as completed in Easy" % level_num)
 		"Normal", "NORMAL":
 			difficulty_value = 2
 			if not levels_completed_normal.has(level_num):
@@ -666,21 +657,26 @@ func mark_level_completed_in_difficulty(level_num: int, difficulty: String) -> v
 				# Check if Level 20 Normal is completed to unlock Hard globally
 				if level_num == 20:
 					hard_globally_unlocked = true
-					print("SaveManager: HARD GLOBALLY UNLOCKED (Level 20 Normal completed)")
-				print("SaveManager: Level %d marked as completed in Normal" % level_num)
+					if gm.debug_mode:
+						print("SaveManager: HARD GLOBALLY UNLOCKED (Level 20 Normal completed)")
+				if gm.debug_mode:
+					print("SaveManager: Level %d marked as completed in Normal" % level_num)
 		"Hard", "HARD":
 			difficulty_value = 3
 			if not levels_completed_hard.has(level_num):
 				levels_completed_hard.append(level_num)
-				print("SaveManager: Level %d marked as completed in Hard" % level_num)
+				if gm.debug_mode:
+					print("SaveManager: Level %d marked as completed in Hard" % level_num)
 		_:
-			print("SaveManager: WARNING - Unknown difficulty '%s'" % difficulty)
+			if gm.debug_mode:
+				print("SaveManager: WARNING - Unknown difficulty '%s'" % difficulty)
 	
 	# Update highest difficulty if this is higher than previous
 	var current_highest = level_highest_difficulty.get(level_num, 0)
 	if difficulty_value > current_highest:
 		level_highest_difficulty[level_num] = difficulty_value
-		print("SaveManager: Level %d highest difficulty updated to %s (was %d)" % [level_num, difficulty, current_highest])
+		if gm.debug_mode:
+			print("SaveManager: Level %d highest difficulty updated to %s (was %d)" % [level_num, difficulty, current_highest])
 	
 	if autosave_progress:
 		save_progress()

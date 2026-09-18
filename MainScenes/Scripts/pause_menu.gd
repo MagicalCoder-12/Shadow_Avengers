@@ -148,6 +148,5 @@ func _update_pause_label_state() -> void:
 
 # Logs debug messages if enabled in Player.gd
 func _debug_log(message: String) -> void:
-	var player: Node = get_tree().get_first_node_in_group("Player")
-	if player and player is Player and player.enable_debug_logging:
+	if GameManager.debug_mode:
 		print("[PauseMenu Debug] " + message)

@@ -27,13 +27,13 @@ var scale_variation: float = 0.0
 
 func _ready() -> void:
 	if speed <= 0:
-		print("Warning: HellPatternBullet speed is non-positive. Setting to 1200.0.")
+		push_warning(" HellPatternBullet speed is non-positive. Setting to 1200.0.")
 		speed = 1200.0
 	if damage <= 0:
-		print("Warning: HellPatternBullet damage is non-positive. Setting to 1.")
+		push_warning(" HellPatternBullet damage is non-positive. Setting to 1.")
 		damage = 1
 	if lifetime <= 0:
-		print("Warning: HellPatternBullet lifetime is non-positive. Setting to 7.0.")
+		push_warning(" HellPatternBullet lifetime is non-positive. Setting to 7.0.")
 		lifetime = 7.0
 	
 	# Add some visual variation
@@ -70,7 +70,7 @@ func set_direction(dir: Vector2) -> void:
 # Sets the speed of the bullet.
 func set_speed(new_speed: float) -> void:
 	if new_speed <= 0:
-		print("Warning: HellPatternBullet speed cannot be non-positive. Setting to 1200.0.")
+		push_warning(" HellPatternBullet speed cannot be non-positive. Setting to 1200.0.")
 		speed = 1200.0
 	else:
 		speed = new_speed
@@ -78,7 +78,7 @@ func set_speed(new_speed: float) -> void:
 # Sets the lifetime of the bullet.
 func set_lifetime(time: float) -> void:
 	if time <= 0:
-		print("Warning: HellPatternBullet lifetime cannot be non-positive. Setting to 7.0.")
+		push_warning(" HellPatternBullet lifetime cannot be non-positive. Setting to 7.0.")
 		lifetime = 7.0
 	else:
 		lifetime = time
@@ -91,7 +91,7 @@ func get_damage() -> int:
 # Sets the damage value of the bullet.
 func set_damage(new_damage: int) -> void:
 	if new_damage <= 0:
-		print("Warning: HellPatternBullet damage is non-positive. Setting to 1.")
+		push_warning(" HellPatternBullet damage is non-positive. Setting to 1.")
 		damage = 1
 	else:
 		damage = new_damage

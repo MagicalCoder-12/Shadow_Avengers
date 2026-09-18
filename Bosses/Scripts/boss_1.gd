@@ -68,11 +68,12 @@ func _pattern_phase_1_fan_burst() -> void:
 
 	for volley in range(3):
 		await _show_muzzle_flash_and_wait(marker)
+		if not is_inside_tree(): break
 		for offset in angles:
 			var direction := base_direction.rotated(offset)
 			spawn_bullet(HELL_PATTERN_SCENE, marker, direction, 520.0, boss_bullet_damage_phase_1, 5.0)
 		if volley < 2:
-			await get_tree().create_timer(pattern_pause_short).timeout
+			if not await _await_boss_timer(pattern_pause_short): break
 	finish_pattern_execution()
 
 func _pattern_phase_1_aimed_dual() -> void:
@@ -93,10 +94,11 @@ func _pattern_phase_1_aimed_dual() -> void:
 		var fire_position := marker.global_position
 		var aim_direction := _get_direction_to_target(fire_position, target_position)
 		await _show_muzzle_flash_and_wait(fire_position)
+		if not is_inside_tree(): break
 		var bullet := spawn_bullet(HOMING_BULLET_SCENE, fire_position, aim_direction, 430.0, boss_bullet_damage_phase_1, 4.0)
 		if bullet and bullet.has_method("set_turn_rate"):
 			bullet.set_turn_rate(0.02)
-		await get_tree().create_timer(pattern_pause_medium).timeout
+		if not await _await_boss_timer(pattern_pause_medium): break
 	finish_pattern_execution()
 
 func _pattern_phase_2_wide_fan_stagger() -> void:
@@ -106,10 +108,11 @@ func _pattern_phase_2_wide_fan_stagger() -> void:
 
 	for wave in range(2):
 		await _show_muzzle_flash_and_wait(marker)
+		if not is_inside_tree(): break
 		for offset in angles:
 			var direction := base_direction.rotated(offset + float(wave) * 0.05)
 			spawn_bullet(HELL_PATTERN_SCENE, marker, direction, 660.0, boss_bullet_damage_phase_2, 5.5)
-		await get_tree().create_timer(pattern_pause_medium).timeout
+		if not await _await_boss_timer(pattern_pause_medium): break
 	finish_pattern_execution()
 
 func _pattern_phase_2_twin_spiral() -> void:
@@ -119,6 +122,7 @@ func _pattern_phase_2_twin_spiral() -> void:
 
 	for step in range(spiral_pairs):
 		await _show_muzzle_flash_and_wait(marker)
+		if not is_inside_tree(): break
 		var rotation_offset := step * 0.22
 		var direction_a := Vector2.RIGHT.rotated(base_angle + rotation_offset)
 		var direction_b := Vector2.RIGHT.rotated(base_angle + PI + rotation_offset)
@@ -129,7 +133,7 @@ func _pattern_phase_2_twin_spiral() -> void:
 			var energy_ball := spawn_bullet(ENERGY_BALL_SCENE, marker, player_direction, 420.0, boss_bullet_damage_phase_2, 4.5)
 			if energy_ball and energy_ball.has_method("set_speed"):
 				energy_ball.set_speed(420.0)
-		await get_tree().create_timer(0.11).timeout
+		if not await _await_boss_timer(0.11): break
 	finish_pattern_execution()
 
 func _get_primary_marker_position() -> Vector2:

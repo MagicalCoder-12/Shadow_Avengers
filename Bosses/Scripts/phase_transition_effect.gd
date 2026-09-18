@@ -6,7 +6,7 @@ class_name PhaseTransitionEffect
 
 func _ready() -> void:
 	if not animation_player:
-		print("Error: AnimationPlayer node not found.")
+		push_error(" AnimationPlayer node not found.")
 		queue_free()
 		return
 	

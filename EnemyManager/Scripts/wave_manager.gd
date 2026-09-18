@@ -1,7 +1,6 @@
 extends Node2D
 class_name WaveManager
 
-
 const COINS = preload("res://Resources/Coins.tscn")
 const CRYSTAL = preload("res://Resources/Crystal.tscn")
 const BOSS_MUSIC_STREAM := preload("res://Assets/Music/Boss_music.mp3")
@@ -24,7 +23,7 @@ signal enemy_killed(enemy: Node2D)
 # Exported properties
 @export var wave_delay: float = 1.5
 @export var formation_manager_scene: PackedScene
-@export var debug_mode: bool = false
+
 @onready var boss_music: AudioStreamPlayer = get_node_or_null("BossMusic")
 
 # Core wave management variables
@@ -35,6 +34,7 @@ var total_waves: int = 0
 var wave_in_progress: bool = false
 var waiting_for_next_wave: bool = false
 var has_completed_level: bool = false
+var _cleaning_up: bool = false  # True during _cleanup_wave to prevent _on_enemy_killed races
 
 # Enemy tracking - active_enemies is now the single source of truth
 var active_enemies: Array[Node2D] = []
@@ -65,16 +65,16 @@ func _ready():
 	stuck_check_timer.start()
 	game_manager = GameManager
 	_ensure_boss_music_player()
-	if boss_music == null and debug_mode:
+	if boss_music == null and GameManager.debug_mode:
 		push_warning("WaveManager: BossMusic node is missing; boss music playback will be skipped.")
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Ready for level %d" % current_level)
 
 func set_waves(wave_configs: Array[WaveConfig]) -> void:
 	waves = wave_configs
 	total_waves = waves.size()
 	current_wave = 0
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Set %d waves for level %d" % [total_waves, current_level])
 
 func start_waves() -> void:
@@ -87,7 +87,7 @@ func start_waves() -> void:
 	waiting_for_next_wave = false
 	has_completed_level = false
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Starting waves for level %d" % current_level)
 
 	start_next_wave()
@@ -98,7 +98,7 @@ func _adjust_wave_difficulty_based_on_selection() -> void:
 	# Apply the difficulty selected by the player
 	if GameManager and GameManager.current_difficulty != null:
 		current_wave_config.difficulty = GameManager.current_difficulty
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Applied selected difficulty: %s" % FormationEnums.DifficultyLevel.keys()[current_wave_config.difficulty])
 	else:
 		# Fallback to performance-based adjustment
@@ -110,24 +110,24 @@ func _adjust_wave_difficulty(new_player_performance: float):
 
 	# Modify enemy count, health, and shooting frequency based on player performance
 	if not current_wave_config:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: No wave config to adjust difficulty")
 		return
 
 	if player_performance > 0.7:  # Player is doing well
 		# Increase difficulty
 		current_wave_config.difficulty = FormationEnums.DifficultyLevel.HARD
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Difficulty set to HARD (player_performance: %.2f)" % player_performance)
 	elif player_performance < 0.3:  # Player is struggling
 		# Decrease difficulty
 		current_wave_config.difficulty = FormationEnums.DifficultyLevel.EASY
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Difficulty set to EASY (player_performance: %.2f)" % player_performance)
 	else:
 		# Keep normal difficulty
 		current_wave_config.difficulty = FormationEnums.DifficultyLevel.NORMAL
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Difficulty set to NORMAL (player_performance: %.2f)" % player_performance)
 
 func _trigger_event_wave(event_type: String):
@@ -139,7 +139,7 @@ func _trigger_event_wave(event_type: String):
 		"elite":
 			_spawn_elite_enemy()
 		_:
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("WaveManager: Unknown event wave type: %s" % event_type)
 
 func _spawn_elite_enemy():
@@ -192,7 +192,7 @@ func _spawn_elite_enemy():
 
 	elite_enemy_spawned = true
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Elite enemy spawned")
 
 func _spawn_enemy_swarm(count: int, enemy_type: FormationEnums.EnemyType):
@@ -246,19 +246,19 @@ func _spawn_enemy_swarm(count: int, enemy_type: FormationEnums.EnemyType):
 
 	swarm_spawned = true
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Enemy swarm spawned with %d enemies" % count)
 
 func start_next_wave() -> void:
 	if current_wave >= total_waves:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: All waves completed for level %d" % current_level)
 		print("WaveManager: Emitting all_waves_cleared signal")
 		all_waves_cleared.emit()
 		return
 
 	if wave_in_progress or waiting_for_next_wave:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Cannot start wave - already in progress or waiting")
 		return
 
@@ -269,7 +269,7 @@ func start_next_wave() -> void:
 	# Apply the selected difficulty instead of performance-based adjustment
 	_adjust_wave_difficulty_based_on_selection()
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Starting wave %d/%d (Level: %d, Difficulty: %s)" % [current_wave + 1, total_waves, current_level, FormationEnums.DifficultyLevel.keys()[current_wave_config.difficulty]])
 
 	wave_started.emit(current_wave + 1, total_waves)
@@ -318,7 +318,7 @@ func _spawn_normal_wave() -> void:
 	# Start formation spawning after FormationManager is added to scene tree
 	formation_manager.call_deferred("spawn_formation", current_wave_config)
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Normal wave spawning started")
 
 func _spawn_boss_wave() -> void:
@@ -369,21 +369,21 @@ func _spawn_boss_wave() -> void:
 
 	enemy_spawned.emit(boss_instance)
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Boss spawned off-screen at %s (Wave: %d, Level: %d)" % [boss_instance.global_position, current_wave + 1, current_level])
 
 func _play_boss_music() -> void:
 	_ensure_boss_music_player()
 	if boss_music:
 		boss_music.play()
-	elif debug_mode:
+	elif GameManager.debug_mode:
 		push_warning("WaveManager: Cannot play boss music because BossMusic is null.")
 
 	if AudioManager:
 		_start_boss_audio()
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("Boss music started by WaveManager")
-	elif debug_mode:
+	elif GameManager.debug_mode:
 		push_warning("WaveManager: AudioManager is unavailable; boss audio bus isolation skipped.")
 
 func _ensure_boss_music_player() -> void:
@@ -433,27 +433,21 @@ func _connect_boss_signals(boss: Node2D) -> void:
 	if boss.has_signal("descent_completed"):
 		boss.descent_completed.connect(func():
 			enemies_alive = 1
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("WaveManager: Boss descent complete - now tracking as alive enemy")
 		)
 
-func _on_boss_phase_changed(phase, boss: Node2D) -> void:
-	if debug_mode:
-		print("WaveManager: Boss phase changed to %s" % phase)
-
+func _on_boss_phase_changed(_phase, boss: Node2D) -> void:
 	# Make boss invincible for 5 seconds after phase change
 	if boss.has_method("set_invincible"):
 		boss.set_invincible(true)
-		if debug_mode:
-			print("WaveManager: Boss made invincible after phase change")
 
 		# Wait 5 seconds then make boss vulnerable again
 		await get_tree().create_timer(5.0).timeout
 
-		if is_instance_valid(boss) and boss.has_method("set_invincible"):
+		# Guard: boss or wave manager may have been freed during the await.
+		if is_instance_valid(boss) and is_instance_valid(self) and boss.has_method("set_invincible"):
 			boss.set_invincible(false)
-			if debug_mode:
-				print("WaveManager: Boss invincibility ended")
 
 # --- Enemy Registration Helpers (Single Source of Truth) ---
 
@@ -464,7 +458,7 @@ func _register_enemy(enemy: Node2D) -> void:
 
 	# Prevent duplicate registration
 	if enemy in active_enemies:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Enemy already registered, skipping: %s" % enemy.name)
 		return
 
@@ -506,7 +500,7 @@ func _unregister_enemy(enemy: Node2D) -> void:
 		if enemy == current_boss:
 			_on_boss_defeated()
 	else:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Attempted to process killed enemy that is invalid or not in active_enemies")
 
 	# Update derived counter
@@ -522,7 +516,7 @@ func _check_wave_completion() -> void:
 
 	# Primary completion condition: no enemies alive
 	if enemies_alive <= 0:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Wave completion conditions met - calling _complete_wave()")
 			print("WaveManager: Calling _complete_wave from _check_wave_completion")
 		_complete_wave()
@@ -536,7 +530,7 @@ func _check_wave_completion() -> void:
 
 	if valid_enemy_count == 0 and enemies_alive > 0:
 		# Clean up discrepancy and complete wave
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Detected discrepancy - forcing completion with %d tracked but 0 valid enemies" % enemies_alive)
 		enemies_alive = 0
 		_complete_wave()
@@ -575,18 +569,18 @@ func _on_enemy_spawned(enemy: Node2D) -> void:
 
 	_register_enemy(enemy)
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Enemy spawned - Total alive: %d (Wave: %d, Level: %d)" % [enemies_alive, current_wave + 1, current_level])
 
 	# Verify count
 	_verify_enemy_count()
 
 func _on_formation_complete() -> void:
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Formation complete for wave %d" % (current_wave + 1))
 
 func _on_all_enemies_destroyed() -> void:
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: All enemies destroyed for wave %d" % (current_wave + 1))
 	# Check for wave completion after all enemies destroyed
 	_check_wave_completion()
@@ -599,7 +593,7 @@ func _verify_enemy_count() -> void:
 
 	# Update enemies_alive to match valid_count if there's a discrepancy
 	if enemies_alive != valid_count:
-		if debug_mode:
+		if GameManager.debug_mode:
 			print("WaveManager: Count mismatch detected - enemies_alive: %d, valid_count: %d (Wave: %d, Level: %d)" % [enemies_alive, valid_count, current_wave + 1, current_level])
 
 		# Only log as error if the discrepancy is significant (> 1)
@@ -611,16 +605,14 @@ func _verify_enemy_count() -> void:
 		enemies_alive = valid_count
 
 func _on_enemy_killed(enemy: Node2D) -> void:
-	if debug_mode:
-		print("WaveManager: Enemy killed - enemies_alive: %d, active_enemies: %d, wave_in_progress: %s" % [enemies_alive, active_enemies.size(), wave_in_progress])
+	# Skip kills during wave cleanup to prevent double-free races.
+	if _cleaning_up or not wave_in_progress:
+		return
 
 	# Consume enemy reward exactly once
 	_consume_enemy_reward(enemy)
 
 	_unregister_enemy(enemy)
-
-	if debug_mode:
-		print("WaveManager: Enemy killed, %d remaining (Wave: %d, Level: %d)" % [enemies_alive, current_wave + 1, current_level])
 
 	# Verify our tracking
 	_verify_enemy_count()
@@ -704,7 +696,7 @@ func _drop_powerup(drop_position: Vector2) -> void:
 	SceneSpawnService.call_deferred("spawn_child", powerup)
 
 func _on_boss_defeated() -> void:
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Boss defeated, boss music stopped, audio volumes restored")
 
 	_stop_boss_audio()
@@ -713,13 +705,13 @@ func _on_boss_defeated() -> void:
 	_check_wave_completion()
 
 func _complete_wave():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: _complete_wave() called - setting waiting_for_next_wave = true")
 
 	wave_completion_time = Time.get_unix_time_from_system()
 	var wave_duration = wave_completion_time - wave_start_time
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Wave %d completed in %.1f seconds (Level: %d)" % [current_wave + 1, wave_duration, current_level])
 
 	wave_cleared.emit(current_wave + 1, current_wave_config)
@@ -731,20 +723,22 @@ func _complete_wave():
 	# Move to next wave
 	current_wave += 1
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Starting wave delay timer for %f seconds" % wave_delay)
 
 	# Create timer for next wave
 	var timer = get_tree().create_timer(wave_delay, false)
 	await timer.timeout
 
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Wave delay timer finished - setting waiting_for_next_wave = false")
 
 	waiting_for_next_wave = false
 	start_next_wave()
 
 func _cleanup_wave():
+	_cleaning_up = true
+
 	# Clean up invalid enemies first
 	var valid_enemies: Array[Node2D] = []
 	for enemy in active_enemies:
@@ -770,10 +764,9 @@ func _cleanup_wave():
 
 	if formation_manager and is_instance_valid(formation_manager) and formation_manager.has_method("reset"):
 		formation_manager.reset()
-		if debug_mode:
-			print("WaveManager: Reset FormationManager for Wave %d" % (current_wave + 1))
 
 	current_boss = null
+	_cleaning_up = false
 
 # Timer to check for stuck wave periodically instead of every frame
 @onready var stuck_check_timer: Timer = _create_stuck_check_timer()
@@ -800,14 +793,14 @@ func _check_for_stuck_wave():
 				valid_enemies.append(enemy)
 				valid_count += 1
 		if valid_count != enemies_alive:
-			if debug_mode:
+			if GameManager.debug_mode:
 				print("WaveManager: Mismatch detected - enemies_alive: %d, valid_enemies: %d (Wave: %d, Level: %d)" % [enemies_alive, valid_count, current_wave + 1, current_level])
 
 			enemies_alive = valid_count
 			active_enemies = valid_enemies
 
 			if enemies_alive <= 0:
-				if debug_mode:
+				if GameManager.debug_mode:
 					print("WaveManager: Forcing wave completion due to no valid enemies remaining")
 				_check_wave_completion()
 
@@ -819,12 +812,12 @@ func _exit_tree():
 			stuck_check_timer.queue_free()
 
 func _on_shadow_mode_activated():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Shadow mode activated")
 	_notify_enemies_shadow_mode(true)
 
 func _on_shadow_mode_deactivated():
-	if debug_mode:
+	if GameManager.debug_mode:
 		print("WaveManager: Shadow mode deactivated")
 	_notify_enemies_shadow_mode(false)
 
@@ -847,7 +840,6 @@ func _sync_enemy_shadow_state(enemy: Node2D) -> void:
 	if enemy.has_method("on_shadow_mode_changed"):
 		# Sync state without triggering activation effects
 		enemy.is_shadow_mode_active = game_manager.level_manager.shadow_mode_enabled
-
 
 func _on_boss_music_finished() -> void:
 	_stop_boss_audio()

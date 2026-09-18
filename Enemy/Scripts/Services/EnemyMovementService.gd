@@ -55,15 +55,23 @@ func load_movement_settings_from_config() -> void:
 	_swarm_coherence = float(movement_settings.get("swarm_coherence", _swarm_coherence))
 	_circle_radius = float(movement_settings.get("circle_radius", _circle_radius))
 
+# Static cache — avoids per-enemy per-frame group lookups.
+static var _cached_player: Player = null
+
 func update_player_reference() -> void:
 	if not _enemy:
 		return
-	if is_instance_valid(_enemy.player_reference):
+	# Use cached reference if still valid.
+	if is_instance_valid(_cached_player):
+		_enemy.player_reference = _cached_player
 		return
+	# Cache miss — do a single group lookup and store the result.
 	var players: Array = _enemy.get_tree().get_nodes_in_group("Player")
 	if players.size() > 0:
-		_enemy.player_reference = players[0]
+		_cached_player = players[0] as Player
+		_enemy.player_reference = _cached_player
 	else:
+		_cached_player = null
 		_enemy.player_reference = null
 
 func handle_entry_shield() -> void:
@@ -72,7 +80,7 @@ func handle_entry_shield() -> void:
 	if _enemy.time_since_spawn >= _enemy.entry_shadow_shield_time:
 		if _enemy.shadow_core_shield and _enemy.shadow_core_shield.visible:
 			_enemy.shadow_core_shield.visible = false
-			if _enemy.debug_mode:
+			if GameManager.debug_mode:
 				print("Entry shield deactivated")
 	else:
 		if _enemy.shadow_core_shield:
@@ -107,7 +115,7 @@ func reach_formation() -> void:
 	_enemy.arrived_at_formation = true
 	_enemy.position = _enemy.formation_position
 	_enemy.formation_reached.emit()
-	if _enemy.debug_mode:
+	if GameManager.debug_mode:
 		print("Enemy reached formation position")
 
 func perform_formation_movement(delta: float) -> void:

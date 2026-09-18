@@ -1,13 +1,41 @@
 [gd_scene format=3 uid="uid://cm88dqm28c6tb"]
 
-[ext_resource type="Script" uid="uid://badg642gd23qd" path="res://UI/TutorialOverlay.gd" id="1_tutorial"]
+[ext_resource type="Script" uid="uid://badg642gd23qd" path="res://addons/fennara/ai/TutorialOverlay.gd" id="1_tutorial"]
 [ext_resource type="Theme" uid="uid://cajsdr5l6wc4w" path="res://Space.tres" id="2_j8oet"]
-[ext_resource type="Texture2D" uid="uid://cqlr1yf4h5ome" path="res://Assets/UI/Main_Menu/Window_2.png" id="3_lvomx"]
+[ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="4_bo2i8"]
+[ext_resource type="Texture2D" uid="uid://baqy7kl72gs1k" path="res://Assets/UI/Tutorial/Commander.png" id="4_nj510"]
+[ext_resource type="FontFile" uid="uid://dbsq32mhr0xuh" path="res://Assets/fonts/IBMPlexSansJP-Light.ttf" id="5_facja"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bo2i8"]
-texture = ExtResource("3_lvomx")
-texture_margin_bottom = 250.0
-region_rect = Rect2(3.0009155, 235.7972, 896.33594, 175.63832)
+[sub_resource type="LabelSettings" id="LabelSettings_progress"]
+font = ExtResource("5_facja")
+font_size = 60
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_343iq"]
+font_size = 40
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 6
+shadow_color = Color(0.4724152, 0.47241515, 0.47241515, 0.61960787)
+
+[sub_resource type="LabelSettings" id="LabelSettings_bo2i8"]
+font = ExtResource("4_bo2i8")
+font_size = 50
+outline_size = 10
+outline_color = Color(0.21806103, 0.21806103, 0.21806103, 1)
+shadow_size = 10
+shadow_color = Color(0, 0, 0, 0.68500006)
+
+[sub_resource type="LabelSettings" id="LabelSettings_facja"]
+font = ExtResource("5_facja")
+font_size = 50
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0.33183005, 0.33183005, 0.33183005, 1)
 
 [node name="TutorialOverlay" type="Control" unique_id=1683281594]
 layout_mode = 3
@@ -20,7 +48,6 @@ mouse_filter = 2
 script = ExtResource("1_tutorial")
 
 [node name="Dimmer" type="ColorRect" parent="." unique_id=1001575134]
-top_level = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,51 +55,107 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset_ratio = Vector2(0.5, 0.5)
-mouse_filter = 2
 color = Color(0.12835406, 0.15170373, 0.29337206, 0.6)
 
 [node name="Card" type="Panel" parent="." unique_id=1122110375]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 21.0
-offset_top = -363.0
-offset_right = -17.0
-grow_horizontal = 2
-grow_vertical = 0
-theme = ExtResource("2_j8oet")
-theme_type_variation = &"Details_panel"
-theme_override_styles/panel = SubResource("StyleBoxTexture_bo2i8")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Card" unique_id=1830181872]
+self_modulate = Color(1, 1, 1, 0.35200003)
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 0.134
+offset_right = -4.0
+offset_bottom = 93.19998
+grow_horizontal = 2
+pivot_offset_ratio = Vector2(0.5, 0.5)
+theme = ExtResource("2_j8oet")
+theme_type_variation = &"Details_panel"
+
+[node name="ProgressLabel" type="Label" parent="Card" unique_id=466651989]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -367.0
+offset_top = 31.0
+offset_right = -17.0
+offset_bottom = 137.0
+grow_horizontal = 0
+text = "Step 1 of 5"
+label_settings = SubResource("LabelSettings_progress")
+horizontal_alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Card" unique_id=1070128201]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -356.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Commander" type="TextureRect" parent="Card/HBoxContainer" unique_id=1982939563]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture = ExtResource("4_nj510")
+expand_mode = 2
+
+[node name="Speaker" type="Label" parent="Card/HBoxContainer/Commander" unique_id=1215964765]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.068571426
+anchor_top = 1.0114286
+anchor_right = 0.87142855
+anchor_bottom = 1.3685714
 grow_horizontal = 2
 grow_vertical = 0
+text = "COMMANDER ADRIAN"
+label_settings = SubResource("LabelSettings_343iq")
+horizontal_alignment = 1
+autowrap_mode = 1
+metadata/_edit_use_anchors_ = true
 
-[node name="Speaker" type="Label" parent="Card/VBoxContainer" unique_id=1732923521]
+[node name="VBoxContainer" type="VBoxContainer" parent="Card/HBoxContainer" unique_id=1531930550]
 layout_mode = 2
-text = "Speaker:"
-
-[node name="Dialogue" type="Label" parent="Card/VBoxContainer" unique_id=1146210591]
-layout_mode = 2
-text = "Dialogue:"
-
-[node name="Status" type="Label" parent="Card/VBoxContainer" unique_id=416846916]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Card/VBoxContainer" unique_id=514085378]
-layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 150)
+offset_transform_visual_only = false
 
-[node name="Skip" type="Button" parent="Card/VBoxContainer/HBoxContainer" unique_id=1384950441]
+[node name="Dialogue" type="Label" parent="Card/HBoxContainer/VBoxContainer" unique_id=1146210591]
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
+size_flags_vertical = 1
+text = "Dialogue:"
+label_settings = SubResource("LabelSettings_bo2i8")
+autowrap_mode = 3
 
-[node name="Continue" type="Button" parent="Card/VBoxContainer/HBoxContainer" unique_id=31556856]
+[node name="Status" type="Label" parent="Card/HBoxContainer/VBoxContainer" unique_id=416846916]
 layout_mode = 2
+text = "Status:"
+label_settings = SubResource("LabelSettings_facja")
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="Card/HBoxContainer/VBoxContainer" unique_id=514085378]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Skip" type="Button" parent="Card/HBoxContainer/VBoxContainer/ButtonsHBox" unique_id=1384950441]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 90
+text = "Skip"
+
+[node name="Continue" type="Button" parent="Card/HBoxContainer/VBoxContainer/ButtonsHBox" unique_id=31556856]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 90
+text = "Next"
+
+[connection signal="pressed" from="Card/HBoxContainer/VBoxContainer/ButtonsHBox/Skip" to="." method="_on_skip_pressed"]
+[connection signal="pressed" from="Card/HBoxContainer/VBoxContainer/ButtonsHBox/Continue" to="." method="_on_continue_pressed"]

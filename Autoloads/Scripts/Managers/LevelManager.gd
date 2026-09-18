@@ -24,7 +24,6 @@ var shadow_mode_tutorial_shown: bool:
 		if gm:
 			gm.set_shadow_mode_tutorial_shown(value, "LevelManager.shadow_mode_tutorial_shown")
 var is_level_just_completed: bool = false
-var is_video_playing: bool = false
 var is_game_over_screen_active: bool = false
 
 # Signals
@@ -63,6 +62,9 @@ func load_level(level_num: int) -> void:
 	gm.change_scene(level_path)
 	await gm.get_tree().create_timer(0.5).timeout
 	
+	# Guard: scene may have changed during the await.
+	if not is_inside_tree():
+		return
 	if gm.get_tree().current_scene:
 		update_hud_visibility(level_num)
 		
@@ -90,11 +92,6 @@ func complete_level(current_level: int) -> void:
 	var hard_was_globally_unlocked: bool = false
 	if gm and gm.save_manager:
 		hard_was_globally_unlocked = gm.save_manager.is_hard_globally_unlocked()
-	
-	# Handle special level completions
-	#if current_level == 20 and not is_video_playing:
-	#	_play_ending_video()
-	#	should_transition_to_next_level = false
 	
 	# Increment completion count regardless of whether it's first time
 	increment_level_completion_count(current_level)
@@ -141,7 +138,7 @@ func _unlock_difficulty_selection() -> void:
 	if gm.save_manager:
 		gm.save_manager.difficulty_unlocked_showed = false
 		gm.save_progress_if_enabled()
-	print("LevelManager: Difficulty selection unlocked after completing level 10")
+
 
 func _unlock_hard_difficulty_selection() -> void:
 	# Trigger hard difficulty unlock notification when level 20 is completed
@@ -149,12 +146,11 @@ func _unlock_hard_difficulty_selection() -> void:
 	if gm.save_manager:
 		gm.save_manager.hard_difficulty_unlocked_showed = false
 		gm.save_progress_if_enabled()
-	print("LevelManager: Hard difficulty selection unlocked after completing level 20")
+
 
 # Track level completion in the specific difficulty
 func _track_difficulty_completion(level_num: int) -> void:
 	if not gm or not gm.save_manager:
-		print("LevelManager: _track_difficulty_completion - no gm or save_manager")
 		return
 	
 	# Get current difficulty from GameManager
@@ -162,27 +158,18 @@ func _track_difficulty_completion(level_num: int) -> void:
 	if gm and "current_difficulty" in gm:
 		difficulty = gm.current_difficulty
 	
-	var difficulty_type_label := "null"
-	if difficulty != null:
-		difficulty_type_label = str(typeof(difficulty))
-	print("LevelManager: _track_difficulty_completion - level=%d, current_difficulty=%s (type=%s)" % [level_num, difficulty, difficulty_type_label])
-	
 	# Try to get difficulty name using the enum directly from GameManager
 	var difficulty_name = ""
 	if difficulty != null:
 		difficulty_name = _get_difficulty_name_from_value(difficulty)
 	
-	print("LevelManager: _track_difficulty_completion - difficulty_name=%s" % difficulty_name)
-	
 	if difficulty_name != "":
 		gm.save_manager.mark_level_completed_in_difficulty(level_num, difficulty_name)
-		print("LevelManager: Level %d completed in %s" % [level_num, difficulty_name])
 
 # Get difficulty name from enum value
 func _get_difficulty_name_from_value(difficulty) -> String:
 	# Direct integer comparison (Godot enums are integers internally)
 	var diff_int = int(difficulty)
-	print("LevelManager: difficulty as int = %d" % diff_int)
 	
 	# EASY = 0, NORMAL = 1, HARD = 2
 	if diff_int == 0:
@@ -201,12 +188,7 @@ func _get_difficulty_name_from_value(difficulty) -> String:
 	elif diff_str.contains("HARD"):
 		return "Hard"
 	
-	print("LevelManager: Could not determine difficulty from value: %s" % diff_str)
 	return ""
-
-# Get difficulty name string from enum (kept for backwards compatibility)
-func _get_difficulty_name(difficulty) -> String:
-	return _get_difficulty_name_from_value(difficulty)
 
 # Check and update difficulty tier completion status
 func _check_tier_completion() -> void:
@@ -218,14 +200,16 @@ func _check_tier_completion() -> void:
 		if _is_easy_tier_completed():
 			gm.save_manager.easy_tier_completed = true
 			gm.save_progress_if_enabled()
-			print("LevelManager: Easy tier fully completed!")
+			if gm.debug_mode:
+				print("LevelManager: Easy tier fully completed!")
 	
 	# Check Normal tier completion (all levels 1-20 must be completed)
 	if not gm.save_manager.normal_tier_completed:
 		if _is_normal_tier_completed():
 			gm.save_manager.normal_tier_completed = true
 			gm.save_progress_if_enabled()
-			print("LevelManager: Normal tier fully completed!")
+			if gm.debug_mode:
+				print("LevelManager: Normal tier fully completed!")
 
 # Check if Easy tier is fully completed (all levels 1-10)
 func _is_easy_tier_completed() -> bool:
@@ -262,35 +246,6 @@ func _show_shadow_mode_tutorial() -> void:
 		is_level_just_completed = false
 	else:
 		push_error("LevelManager: Cannot add tutorial: No current scene available")
-
-#func _play_ending_video() -> void:
-#	var current_scene = gm.get_tree().current_scene
-#	if current_scene and ResourceLoader.exists(gm.scene_manager.VIDEO_SCENE):
-#		is_video_playing = true
-#		AudioManager.lower_bus_volumes_except(["Video", "Master"], -10.0)
-#		
-#		var video_layer = CanvasLayer.new()
-#		video_layer.name = "VideoPlaybackLayer"
-#		video_layer.layer = 10
-#		
-#		var video_scene: Node = load(gm.scene_manager.VIDEO_SCENE).instantiate()
-#		video_layer.add_child(video_scene)
-#		current_scene.add_child(video_layer)
-#		
-#		if video_scene.has_signal("finished"):
-#			video_scene.finished.connect(_on_video_finished.bind(video_layer))
-#		else:
-#			await gm.get_tree().create_timer(10.0).timeout
-#			_on_video_finished(video_layer)
-#	else:
-#		push_error("LevelManager: Cannot play video: No current scene or VideoPlayback.tscn missing")
-
-#func _on_video_finished(video_layer: CanvasLayer) -> void:
-#	AudioManager.restore_bus_volumes()
-#	video_layer.queue_free()
-#	is_video_playing = false
-#	gm.change_scene(gm.scene_manager.START_SCREEN_SCENE)
-#	is_level_just_completed = false
 
 func unlock_next_level(current_level: int) -> void:
 	var next_level: int = current_level + 1
@@ -399,7 +354,6 @@ func get_current_level() -> int:
 func reset_level_state() -> void:
 	gm.request_shadow_mode_deactivate_silent("LevelManager.reset_level_state")
 	is_level_just_completed = false
-	is_video_playing = false
 	is_game_over_screen_active = false
 
 func reset_level_progress() -> void:
@@ -443,9 +397,8 @@ func _on_all_waves_cleared() -> void:
 	gm.all_waves_cleared.emit()
 
 func _on_boss_defeated() -> void:
-	gm.score += 1000
-	
-	# Emit boss_defeated signal for the Level scene to handle
+	# Emit boss_defeated signal for the Level scene to handle.
+	# Score is awarded by Level._on_boss_defeated which also handles UI.
 	boss_defeated.emit()
 	
 	# For all levels, complete the level properly through the unified flow
@@ -462,6 +415,3 @@ func _exit_tree() -> void:
 	# Note: In autoloads, this is rarely called, but good practice
 	pass
 
-func _on_level_selected(level_num: int) -> void:
-	if is_level_unlocked(level_num):
-		load_level(level_num)
