@@ -548,6 +548,10 @@ func _on_level_manager_boss_defeated() -> void:
 		_show_level_completed_ui()
 
 func _input(event):
+	# Debug-only input: the dev_win action must not do anything in a release
+	# build, even though the input action itself still exists in project.godot.
+	if not DebugFlags.enabled:
+		return
 	if GameManager.debug_mode and event.is_action_pressed("debug_next_level"):
 		_unlock_next_level_debug()
 	if event.is_action_pressed("dev_win"):

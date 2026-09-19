@@ -866,6 +866,7 @@ func _on_selected_pressed() -> void:
 		if bool(result.get("ok", false)):
 			PlayerManager.update_selected_satellites()
 			_show_message(str(result.get("message", "")))
+			TutorialManager.notify_satellite_equipped()
 	else:
 		var ship = GameManager.ships[selected_ship_index]
 		var result := selection_service.select_ship(GameManager, ship)
@@ -1022,6 +1023,8 @@ func _optimize_texture_loading() -> void:
 	ui_refresh_service.optimize_texture_loading(GameManager, ship_textures_ui, selected_ship_index)
 
 func _debug_grant_resources(crystal: int = 1000000, coin: int = 500000, void_shard: int = 500000) -> void:
+	if DebugFlags.block("upgrade_menu resource grant"):
+		return
 	GameManager.add_currency("crystals", crystal)
 	GameManager.add_currency("coins", coin)
 	GameManager.add_currency("void_shards", void_shard)
@@ -1031,6 +1034,10 @@ func _debug_grant_resources(crystal: int = 1000000, coin: int = 500000, void_sha
 # INPUT HANDLING
 # ================================
 func _input(event: InputEvent) -> void:
+	# Every shortcut below is a debug/easy-win cheat (free items, instant
+	# upgrade, 1M crystals). None of it may exist in a release build.
+	if not DebugFlags.enabled:
+		return
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8:
@@ -1358,6 +1365,8 @@ func _purchase_satellite(satellite_index: int) -> bool:
 	var action_text := "unlocked" if bool(result.get("was_free", false)) else "purchased"
 	_show_message("%s %s!" % [satellite["display_name"], action_text])
 	_update_currency_display()
+	# The campaign now walks the player from BUY to the equip button.
+	TutorialManager.notify_satellite_purchased()
 	return true
 
 func _purchase_ship(ship_index: int) -> bool:
@@ -1409,6 +1418,7 @@ func _on_sat_left_select_pressed() -> void:
 	if bool(result.get("ok", false)):
 		PlayerManager.update_selected_satellites()
 		_show_message(str(result.get("message", "")))
+		TutorialManager.notify_satellite_equipped()
 
 
 func _on_sat_right_select_pressed() -> void:
@@ -1418,6 +1428,7 @@ func _on_sat_right_select_pressed() -> void:
 	if bool(result.get("ok", false)):
 		PlayerManager.update_selected_satellites()
 		_show_message(str(result.get("message", "")))
+		TutorialManager.notify_satellite_equipped()
 
 
 func _on_selected_ship_gui_input(event: InputEvent) -> void:

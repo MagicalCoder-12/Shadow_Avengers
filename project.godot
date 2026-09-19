@@ -38,6 +38,7 @@ buses/default_bus_layout="uid://vt7iqtmav27l"
 
 [autoload]
 
+DebugFlags="*res://Autoloads/Scripts/Debug/debug_flags.gd"
 ConfigLoader="*res://Autoloads/Scripts/Managers/ConfigLoader.gd"
 AudioManager="*res://Autoloads/Scripts/Systems/AudioManager.gd"
 SaveManager="*res://Autoloads/Scripts/Managers/SaveManager.gd"
@@ -50,6 +51,8 @@ GameManager="*res://Autoloads/game_manager.tscn"
 BulletFactory="*res://Autoloads/Bullet_Factory.tscn"
 SceneSpawnService="*res://Autoloads/Scripts/Services/SceneSpawnService.gd"
 TutorialManager="*res://Autoloads/Scripts/Managers/TutorialManager.gd"
+MobileProfiler="*res://Autoloads/Scripts/Debug/mobile_profiler.gd"
+_fennara_game_capture="*res://addons/fennara/runtime/game_capture_helper.gd"
 
 [debug]
 

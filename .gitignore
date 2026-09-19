@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
-android/
+android/build/
+
 # Godot-specific ignores
 .import/
 export.cfg
@@ -12,18 +13,24 @@ export_credentials.cfg
 # Mono-specific ignores
 .mono/
 data_*/
-mono_crash.*.jsonandroid/build/
+mono_crash.*.json
+
+# Android build artifacts
 *.apk
+*.aab
 *.aar
 *.so
+
+# External tool rules
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
-.roo/rules/byterover-rules.md
-.windsurf/rules/byterover-rules.md
-.cursor/rules/byterover-rules.mdc
-.kiro/steering/byterover-rules.md
-.qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md*.aab
-Apks/
-.qoder/
-.vscode/
+
+# Fennara local runtime artifacts (probes are tracked, run outputs are not)
+.fennara/state/
+.fennara/scripts/runtime/
+
+# Fennara editor binaries + temp downloads (27MB of nested engine/rg builds;
+# rebuild from the addon source instead of committing them)
+addons/fennara/bin/
+*~RF*.TMP
+~*.TMP

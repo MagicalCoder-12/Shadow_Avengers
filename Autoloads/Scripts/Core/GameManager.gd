@@ -93,7 +93,7 @@ const SATELLITE_ASCENSION_THRESHOLDS: Dictionary = {
 
 # Debug/Developer settings
 @export var debug_mode: bool = false  # Centralized debug flag — all scripts should reference this
-var enable_dev_win: bool = true  # Debug utility: allow instant level completion with "W" key
+var enable_dev_win: bool = false  # Debug utility: instant level completion. Dev-only; callers must enable explicitly.
 @export var allow_god_mode: bool = true
 const GOD_MODE_DAMAGE_MULTIPLIER: int = 10
 const GOD_MODE_RESOURCE_AMOUNT: int = 99999
@@ -187,6 +187,7 @@ var game_scene_service: GameSceneService = GAME_SCENE_SERVICE_SCRIPT.new()
 
 func _ready() -> void:
 	god_mode_enabled = false
+	_apply_debug_gates()
 
 	# Reference autoload managers instead of instantiating them
 	save_manager = SaveManager
@@ -334,14 +335,21 @@ func request_shadow_mode_deactivate_silent(_source: String = "") -> void:
 		if shadow_mode_timer:
 			shadow_mode_timer.stop()
 
+## Debug-only surfaces are hard-off unless this is a debug build.
+func _apply_debug_gates() -> void:
+	var debug_build: bool = DebugFlags.enabled
+	debug_mode = debug_mode and debug_build
+	enable_dev_win = enable_dev_win and debug_build
+	allow_god_mode = allow_god_mode and debug_build
+
 func can_use_god_mode() -> bool:
-	return allow_god_mode
+	return allow_god_mode and DebugFlags.enabled
 
 func is_god_mode_active() -> bool:
-	return allow_god_mode and god_mode_enabled
+	return allow_god_mode and god_mode_enabled and DebugFlags.enabled
 
 func set_god_mode_enabled(enabled: bool, _source: String = "") -> void:
-	var next_state := enabled and allow_god_mode
+	var next_state := enabled and allow_god_mode and DebugFlags.enabled
 	if god_mode_enabled == next_state:
 		return
 
@@ -362,6 +370,8 @@ func get_god_mode_damage(value: int) -> int:
 	return max(1, value * GOD_MODE_DAMAGE_MULTIPLIER)
 
 func _grant_god_mode_resources() -> void:
+	if not is_god_mode_active():
+		return
 	crystal_count = GOD_MODE_RESOURCE_AMOUNT
 	coin_count = GOD_MODE_RESOURCE_AMOUNT
 	void_shards_count = GOD_MODE_RESOURCE_AMOUNT
@@ -840,7 +850,7 @@ func _on_prepare_map_scene() -> void:
 # Debug utility: instantly complete the current level
 # Only active when enable_dev_win is true (development/debug mode)
 func dev_win() -> void:
-	if not enable_dev_win:
+	if not enable_dev_win or not DebugFlags.enabled:
 		return
 
 	# Only process if we're in a level scene
