@@ -8,6 +8,16 @@ var save_debounce_seconds: float = 1.0
 const SAVE_FORMAT_MAGIC: String = "shadow_avenger_save"
 const SAVE_SCHEMA_VERSION: int = 3
 
+# First satellite the new-player campaign hands out. Enforcing its locked state
+# keeps the shop's BUY button on screen until the player buys it.
+const FIRST_SATELLITE_ID: String = "Satellite1"
+# Campaign checkpoints reached only after the satellite has been purchased and
+# equipped. Older saves past these points are left exactly as they are.
+const STAGES_AFTER_SATELLITE_EQUIP: Array = [
+	"shop_exit", "level1_entry", "level1_playing", "wheel_intro",
+	"shadow_map_intro", "shadow_charge_explained", "shadow_activated", "complete",
+]
+
 # Default resource values for new or reset progress
 const DEFAULT_RESOURCES: Dictionary = {
 	"crystal_count": 700,
@@ -465,6 +475,29 @@ func _apply_data_validation() -> void:
 			if not ResourceLoader.exists(path, "Texture2D"):
 				push_warning("Invalid satellite texture path %s for %s, using fallback" % [path, satellite.get("display_name", "Unknown")])
 				satellite["texture"] = "res://Assets/Satellite/Sat_textures/Sat1.png"
+
+	_migrate_tutorial_satellite_lock()
+
+
+## Saves written before the shop-tutorial rework kept the first satellite
+## unlocked. That hides the shop's BUY button (the satellite reads as owned, so
+## only Equip + arrows appear) and dead-ends the new-player campaign. Until the
+## checkpoint shows the satellite was already bought, force it locked so the flow
+## reads Buy -> Equip. Established and completed campaigns are never touched.
+func _migrate_tutorial_satellite_lock() -> void:
+	if not bool(tutorial_state.get("eligible_for_automatic_tutorials", false)):
+		return
+	if get_tutorial_campaign_stage() in STAGES_AFTER_SATELLITE_EQUIP:
+		return
+	for satellite in gm.satellites:
+		if not (satellite is Dictionary):
+			continue
+		if str(satellite.get("id", "")) != FIRST_SATELLITE_ID:
+			continue
+		if bool(satellite.get("unlocked", false)):
+			satellite["unlocked"] = false
+			push_warning("Tutorial migration: locked %s so the shop keeps offering BUY." % FIRST_SATELLITE_ID)
+
 
 func reset_progress() -> void:
 	gm.player_lives = 3

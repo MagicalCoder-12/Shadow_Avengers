@@ -3,10 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://bmlutcsqb2gte" path="res://Enemy/Enemy.tscn" id="1_nah5n"]
 [ext_resource type="Script" uid="uid://b8l8ty3twy8ct" path="res://Enemy/Scripts/BouncerEnemy.gd" id="2_1pj6a"]
 [ext_resource type="Texture2D" uid="uid://dk8mqktbkryku" path="res://Assets/Enemy/Enemy2_shadow.png" id="3_75h7e"]
+[ext_resource type="Texture2D" path="res://Assets/Enemy/Enemy_2Light.png" id="tex_Enemy_2Light"]
 
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1pj6a"]
-load_path = "res://.godot/imported/Enemy_2Light.png-b969a2702685bda7b6349b48e7a656f6.ctex"
 
 [node name="BouncerEnemy" unique_id=1623952910 instance=ExtResource("1_nah5n")]
 script = ExtResource("2_1pj6a")
@@ -14,7 +12,7 @@ shadow_texture = ExtResource("3_75h7e")
 enemy_type = "BouncerEnemy"
 
 [node name="Sprite2D" parent="." index="0" unique_id=1747645234]
-texture = SubResource("CompressedTexture2D_1pj6a")
+texture = ExtResource("tex_Enemy_2Light")
 
 [node name="VisibleOnScreenNotifier2D" parent="." index="2" unique_id=1167556555]
 rect = Rect2(-23.508904, -22.462856, 47.46404, 46.764877)

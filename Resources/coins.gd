@@ -74,7 +74,7 @@ func _physics_process(delta: float) -> void:
 		global_position.y = bottom_bounds
 		if not is_grounded:
 			# Apply initial bounce: fixed velocity scaled by restitution
-			velocity.y = --1000.0 * restitution
+			velocity.y = -1000.0 * restitution
 			is_grounded = true
 			
 		elif velocity.y > 0:

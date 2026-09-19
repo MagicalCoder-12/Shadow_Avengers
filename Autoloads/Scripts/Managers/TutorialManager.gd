@@ -28,7 +28,10 @@ func should_route_to_level_zero() -> bool:
 	return is_new_player_campaign_active() and get_campaign_stage() == "level0_intro"
 
 func can_open_shop() -> bool:
-	return not is_new_player_campaign_active() or get_campaign_stage() == "shop_entry"
+	if not is_new_player_campaign_active():
+		return true
+	var stage := get_campaign_stage()
+	return stage in ["shop_entry", "shop_reward", "shop_satellite_equip"]
 
 func can_upgrade_in_shop() -> bool:
 	if not is_new_player_campaign_active():
@@ -97,27 +100,47 @@ func complete_level_zero() -> bool:
 
 func on_map_ready() -> void:
 	match get_campaign_stage():
-		"shop_entry", "shop_upgrade", "shop_satellite_tab", "shop_satellite_upgrade", "shop_exit":
+		"shop_entry", "shop_reward", "shop_upgrade", "shop_satellite_tab", "shop_satellite_upgrade", "shop_satellite_equip", "shop_exit":
 			_show_step("map_shop", {"text": "Training complete. Open the Ship Hanger To upgrade ship.", "status": "Tap SHOP.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "CanvasLayer/Shop"})
 		"level1_entry":
 			_show_step("map_level1", {"text": "Your fighter is stronger now. Select Level 1—the real operation starts here.", "status": "Tap Level 1.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "LevelButtons/LevelButton1"})
 		"shadow_map_intro":
 			_show_step("shadow_map", {"text": "Shadow Drive unlocked. In Level 6, destroy enemies to fill its gauge, then release it when READY.", "status": "Tap NEXT to continue.", "completion": "continue", "next_stage": "shadow_charge_explained", "allow_player_input": false, "dim_amount": 0.5, "allow_skip": false})
 
+## Step 1 of the shop visit: highlight the resource bar so the player connects
+## the payout they just earned with the upgrade they are about to buy. Without
+## this the upgrade prompt arrives with no context for what was received.
+func _shop_reward_step_def() -> Dictionary:
+	var coins := int(GameManager.coin_count)
+	var crystals := int(GameManager.crystal_count)
+	return {
+		"text": "Training payout received, pilot. %d coins and %d crystals are in your account - check them up here before you spend a single one." % [coins, crystals],
+		"status": "+%d coins, +%d crystals" % [coins, crystals],
+		"completion": "continue", "next_stage": "shop_upgrade",
+		"allow_player_input": true, "dim_amount": 0.45, "allow_skip": false,
+		"target_path": "Resources",
+	}
+
+## Step 2 of the shop visit: spend the allowance on the first ship upgrade.
+func _shop_upgrade_step_def() -> Dictionary:
+	return {"text": "Command has issued an upgrade allowance. Spend it on this ship now.", "status": "Use the coin upgrade button.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/HBoxContainer/Upgrade_coins"}
+
 func notify_shop_opened() -> void:
 	var stage := get_campaign_stage()
-	if stage != "shop_entry" and stage != "shop_upgrade":
+	if stage != "shop_entry" and stage != "shop_reward" and stage != "shop_upgrade":
 		return
 	if stage == "shop_entry":
-		_set_stage("shop_upgrade")
+		# The payout reveal is what the player should see first inside the shop.
+		_set_stage("shop_reward")
 
 func on_shop_ready(shop: Node) -> void:
 	var stage := get_campaign_stage()
-	if stage != "shop_upgrade" and stage != "shop_entry":
+	if stage != "shop_upgrade" and stage != "shop_entry" and stage != "shop_reward" and stage != "shop_satellite_equip":
 		return
-	# If they just arrived from the map (stage is still shop_entry), advance it.
+	# If they just arrived from the map (stage is still shop_entry), the payout
+	# reveal comes before any upgrade prompt.
 	if stage == "shop_entry":
-		_set_stage("shop_upgrade")
+		_set_stage("shop_reward")
 	if not SaveManager.get_tutorial_flag("shop_investment_granted"):
 		var cost: int = 0
 		if shop and shop.has_method("_get_current_upgrade_costs"):
@@ -127,7 +150,13 @@ func on_shop_ready(shop: Node) -> void:
 		if cost > 0:
 			GameManager.add_currency("coins", cost)
 		SaveManager.set_tutorial_flag("shop_investment_granted")
-	_show_step("shop_upgrade", {"text": "Command has issued an upgrade allowance. Spend it on this ship now.", "status": "Use the coin upgrade button.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/HBoxContainer/Upgrade_coins"})
+	match get_campaign_stage():
+		"shop_reward":
+			_show_step("shop_reward", _shop_reward_step_def())
+		"shop_satellite_equip":
+			_show_step("shop_satellite_equip", _shop_satellite_equip_step_def())
+		_:
+			_show_step("shop_upgrade", _shop_upgrade_step_def())
 
 func notify_upgrade_completed() -> void:
 	if get_campaign_stage() != "shop_upgrade":
@@ -141,10 +170,32 @@ func notify_satellite_tab_opened() -> void:
 		return
 	_set_stage("shop_satellite_upgrade")
 	_clear_overlay(true)
-	_show_step("shop_satellite_upgrade", {"text": "Select a satellite and upgrade it to boost your firepower.", "status": "Tap the BUY button.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/Buy_Ascend/Buy"})
+	_show_step("shop_satellite_upgrade", {"text": "Select a satellite and upgrade it to boost your firepower.", "status": "Tap the BUY button.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_paths": [{"path": "UI/Buy_Ascend/Buy", "status": "Tap the BUY button."}, {"path": "UI/HBoxContainer/Upgrade_coins", "status": "Use the coin upgrade button."}]})
+
+## Step 3 of the shop visit: the satellite is bought, so the next real action
+## is equipping it. The old flow demanded a coin upgrade here and then announced
+## "satellite equipped" without the player ever equipping anything.
+func _shop_satellite_equip_step_def() -> Dictionary:
+	return {"text": "Satellite secured. Equip it now so it flies with you into the next mission.", "status": "Tap SELECT to equip.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_paths": [{"path": "UI/Buy_Ascend/Sat_left_select", "status": "Tap SELECT to equip."}, {"path": "UI/Buy_Ascend/Sat_right_select", "status": "Tap SELECT to equip."}, {"path": "UI/Buy_Ascend/Selected", "status": "Tap SELECT to equip."}, {"path": "UI/Bottom_ui/Bottom/HBoxContainer/Back", "status": "Tap BACK."}]}
+
+## Called by the shop right after a satellite purchase succeeds.
+func notify_satellite_purchased() -> void:
+	if get_campaign_stage() != "shop_satellite_upgrade":
+		return
+	_set_stage("shop_satellite_equip")
+	_clear_overlay(true)
+	_show_step("shop_satellite_equip", _shop_satellite_equip_step_def())
+
+## Called by the shop once the satellite is actually equipped.
+func notify_satellite_equipped() -> void:
+	if get_campaign_stage() != "shop_satellite_equip":
+		return
+	_set_stage("shop_exit")
+	_clear_overlay(true)
+	_show_step("shop_exit", {"text": "Satellite equipped. Leave the Ship Bay and begin Level 1.", "status": "Tap BACK.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/Bottom_ui/Bottom/HBoxContainer/Back"})
 
 func notify_satellite_upgraded() -> void:
-	if get_campaign_stage() != "shop_satellite_upgrade":
+	if get_campaign_stage() != "shop_satellite_upgrade" and get_campaign_stage() != "shop_satellite_equip":
 		return
 	_set_stage("shop_exit")
 	_clear_overlay(true)
@@ -235,7 +286,18 @@ func _show_step(id: String, step: Dictionary) -> bool:
 	if _clearing:
 		_clearing = false
 	if not _active_id.is_empty():
-		return false
+		# Self-heal: a scene change can free the old overlay without a formal
+		# _clear_overlay (e.g. tapping SHOP swaps scenes directly). If the old
+		# overlay is gone from the tree, the step is dead — clear and continue.
+		if _overlay == null or not is_instance_valid(_overlay) or not _overlay.is_inside_tree():
+			_active_id = ""
+			_active_step.clear()
+			if _tutorial_layer != null and is_instance_valid(_tutorial_layer):
+				_tutorial_layer.queue_free()
+			_tutorial_layer = null
+			_overlay = null
+		else:
+			return false
 	var current_scene: Node = get_tree().current_scene
 	if not is_instance_valid(current_scene):
 		return false
@@ -300,6 +362,9 @@ func _show_chained_step(stage: String) -> void:
 				"status": "Tap NEXT.", "completion": "continue", "next_stage": "level0_powerup",
 				"allow_player_input": false, "dim_amount": 0.48, "allow_skip": false
 			})
+		"shop_upgrade":
+			# Reached when the player taps NEXT on the payout reveal.
+			_show_step("shop_upgrade", _shop_upgrade_step_def())
 		"level0_powerup":
 			_show_step("level0_powerup", {
 				"text": "Collect power cores to increase your firepower during this mission.",

@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://djv02b634b0pv" path="res://MainScenes/difficulty_selection.tscn" id="16_xoeuw"]
 [ext_resource type="PackedScene" uid="uid://cb4y2g0ulc7gu" path="res://MainScenes/difficulty_unlocked.tscn" id="17_tgjig"]
 [ext_resource type="PackedScene" uid="uid://cvp3h6kj6bqrh" path="res://MainScenes/harddifficulty_unlocked.tscn" id="18_5ps16"]
+[ext_resource type="Texture2D" path="res://Assets/Background/bg4.png" id="tex_bg4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_bmidu"]
 font = ExtResource("2_3g1qk")
@@ -27,9 +28,6 @@ outline_size = 10
 outline_color = Color(1, 0, 0, 1)
 shadow_size = 100
 shadow_color = Color(1, 1, 0, 0)
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_t0nxn"]
-load_path = "res://.godot/imported/bg4.png-7d654569044a3e7981966d5bb99e9fd4.ctex"
 
 [node name="Map" type="Control" unique_id=211571517]
 layout_mode = 3
@@ -87,7 +85,7 @@ anchor_left = -0.05486111
 anchor_top = -2.7503126
 anchor_right = 1.1993055
 anchor_bottom = -1.8403125
-texture = SubResource("CompressedTexture2D_t0nxn")
+texture = ExtResource("tex_bg4")
 metadata/_edit_use_anchors_ = true
 
 [node name="Space" type="TextureRect" parent="." unique_id=2025764118]

@@ -6,10 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://chom5tjb0ccyo" path="res://Assets/player/Example_ships/ships-03/Spaceships-03-Purple-03.png" id="3_syngj"]
 [ext_resource type="Texture2D" uid="uid://ccl5my2qqu1ab" path="res://Assets/player/ship_textures/ship_03_lvl1.png" id="4_0vkc4"]
 [ext_resource type="Texture2D" uid="uid://cqdd05mkuc4dw" path="res://Assets/player/ship_textures/ship_03_lvl2.png" id="5_2p0rf"]
+[ext_resource type="Texture2D" path="res://Assets/player/ship_textures/ship_03_lvl0.png" id="tex_ship_03_lvl0"]
 
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bargi"]
-load_path = "res://.godot/imported/ship_03_lvl0.png-4c564a724fd7af508b2502d2657b8056.ctex"
 
 [node name="astrablade" unique_id=1518064930 instance=ExtResource("1_jvelg")]
 scale = Vector2(2, 2)
@@ -35,7 +33,7 @@ shadow_texture = ExtResource("3_syngj")
 evolution_textures = Array[Texture2D]([ExtResource("3_pvn5r"), ExtResource("4_0vkc4"), ExtResource("5_2p0rf")])
 
 [node name="Sprite2D" parent="." index="0" unique_id=888187266]
-texture = SubResource("CompressedTexture2D_bargi")
+texture = ExtResource("tex_ship_03_lvl0")
 flip_v = true
 
 [node name="Thruster" parent="Sprite2D" index="0" unique_id=1472620250]

@@ -2,9 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bmlutcsqb2gte" path="res://Enemy/Enemy.tscn" id="1_4sc6u"]
 [ext_resource type="Script" uid="uid://mle6bqrkr3n6" path="res://Enemy/Scripts/FastEnemy.gd" id="2_a2oy4"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4sc6u"]
-load_path = "res://.godot/imported/enemyUFO.png-361d27227d77bae33c0f7c4c2c95dbf6.ctex"
+[ext_resource type="Texture2D" path="res://Assets/Enemy/enemyUFO.png" id="tex_enemyUFO"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_a2oy4"]
 radius = 91.39414
@@ -15,7 +13,7 @@ script = ExtResource("2_a2oy4")
 enemy_type = "FastEnemy"
 
 [node name="Sprite2D" parent="." index="0" unique_id=1747645234]
-texture = SubResource("CompressedTexture2D_4sc6u")
+texture = ExtResource("tex_enemyUFO")
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=929163854]
 shape = SubResource("CircleShape2D_a2oy4")

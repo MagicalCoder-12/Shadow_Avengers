@@ -778,11 +778,6 @@ func _create_stuck_check_timer() -> Timer:
 	timer.wait_time = 1.0  # Check every second instead of every frame
 	return timer
 
-func _physics_process(_delta: float):
-	# Only check for stuck wave when timer is not running
-	# The actual check happens in the timer callback
-	pass
-
 func _check_for_stuck_wave():
 	if wave_in_progress and not waiting_for_next_wave:
 		# Check for stuck wave due to untracked enemy deaths

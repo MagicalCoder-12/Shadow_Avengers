@@ -1,12 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://bopu7be41kgdd"]
 
 [ext_resource type="PackedScene" uid="uid://ds3nbbjqkkkla" path="res://Bullet/PlBullet/player_bullet_2.tscn" id="1_ggwws"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bfcnq"]
-load_path = "res://.godot/imported/Slash.png-bc64302b81a5339ab440d0309101829e.ctex"
+[ext_resource type="Texture2D" path="res://Assets/Props/Slash.png" id="tex_Slash"]
 
 [node name="super" instance=ExtResource("1_ggwws")]
 
 [node name="Sprite2D" parent="." index="0"]
 modulate = Color(1, 0, 0.576471, 1)
-texture = SubResource("CompressedTexture2D_bfcnq")
+texture = ExtResource("tex_Slash")

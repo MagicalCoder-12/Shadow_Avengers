@@ -73,6 +73,18 @@ func _is_satellite_unlocked(satellite_id: String) -> bool:
 			return bool(satellite.get("unlocked", false))
 	return false
 
+## Public wrapper used by gameplay services (e.g. PlayerSatelliteService).
+func is_satellite_unlocked(satellite_id: String) -> bool:
+	return _is_satellite_unlocked(satellite_id)
+
+## First unlocked satellite id, or "" when the player owns none yet.
+func _first_unlocked_satellite_id() -> String:
+	if gm and gm.satellites is Array:
+		for satellite in gm.satellites:
+			if satellite is Dictionary and bool(satellite.get("unlocked", false)):
+				return str(satellite.get("id", ""))
+	return ""
+
 # Ensure both satellite slots always resolve to unlocked IDs.
 func sanitize_selected_satellite_ids() -> void:
 	if selected_satellite_ids.size() < 2:
@@ -80,7 +92,9 @@ func sanitize_selected_satellite_ids() -> void:
 	for i in range(2):
 		var candidate: String = str(selected_satellite_ids[i]) if i < selected_satellite_ids.size() else ""
 		if candidate.is_empty() or not _is_satellite_unlocked(candidate):
-			selected_satellite_ids[i] = DEFAULT_SATELLITE_ID
+			# Never force a LOCKED satellite into a slot: before the shop
+			# tutorial the player owns none, so the slot stays empty.
+			selected_satellite_ids[i] = _first_unlocked_satellite_id()
 
 func get_selected_satellite_id(slot_index: int) -> String:
 	sanitize_selected_satellite_ids()

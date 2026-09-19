@@ -4,10 +4,8 @@
 [ext_resource type="Script" uid="uid://bhm3g60pqs4mn" path="res://Satellites/Scripts/satellite2.gd" id="2_a266u"]
 [ext_resource type="Texture2D" uid="uid://bsxh7ep1ao0tr" path="res://Assets/Satellite/Sat_textures/Sat2.png" id="2_tbjiy"]
 [ext_resource type="PackedScene" uid="uid://6smx304r5nlr" path="res://Bullet/Sat_bullet/Sat_bullet2.tscn" id="3_a266u"]
+[ext_resource type="Texture2D" path="res://Assets/Satellite/Ship2/Parts/ship2_detail.png" id="tex_ship2_detail"]
 
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ab65c"]
-load_path = "res://.godot/imported/ship2_detail.png-54b986844e94feead2112bbaf809dfd7.ctex"
 
 [sub_resource type="Animation" id="Animation_2qiud"]
 loop_mode = 1
@@ -80,7 +78,7 @@ texture = ExtResource("2_tbjiy")
 [node name="Ship2Detail" parent="." index="1" unique_id=956193229]
 position = Vector2(0.9999999, 10)
 rotation = 1.5798266
-texture = SubResource("CompressedTexture2D_ab65c")
+texture = ExtResource("tex_ship2_detail")
 
 [node name="AnimationPlayer" parent="." index="2" unique_id=1395619866]
 libraries/ = SubResource("AnimationLibrary_obnii")

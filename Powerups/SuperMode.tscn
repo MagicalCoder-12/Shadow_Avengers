@@ -1,9 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://gl3w3b2ejnjo"]
 
 [ext_resource type="PackedScene" uid="uid://bdruofng85taf" path="res://Powerups/Health.tscn" id="1"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0djak"]
-load_path = "res://.godot/imported/Rockets_Bonus.png-63a4e7e0cdb36d4655835cc6c6dec8d5.ctex"
+[ext_resource type="Texture2D" path="res://Assets/Bonus_Items/Rockets_Bonus.png" id="tex_Rockets_Bonus"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_je321"]
 radius = 76.5261
@@ -12,7 +10,7 @@ radius = 76.5261
 powerup_type = 1
 
 [node name="Sprite2D" parent="." index="0"]
-texture = SubResource("CompressedTexture2D_0djak")
+texture = ExtResource("tex_Rockets_Bonus")
 region_rect = Rect2(282, 6, 186, 186)
 
 [node name="CollisionShape2D" parent="." index="1"]

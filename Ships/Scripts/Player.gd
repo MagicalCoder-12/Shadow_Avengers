@@ -47,6 +47,7 @@ var death_in_progress: bool = false
 var lives: int = 3  # Synced with GameManager
 var original_texture: Texture2D
 var original_speed: float
+var laser_shoot_sfx: AudioStream = preload("res://Assets/Music/Laser_Shoot16.wav")
 var super_mode_timer: Timer
 var input_enabled: bool = true
 const REVIVE_INVINCIBILITY_DURATION: float = 4.0
@@ -293,7 +294,7 @@ func shoot() -> void:
 
 	# Play shooting sound via AudioManager
 	if AudioManager:
-		AudioManager.play_sound_effect(preload("res://Assets/Music/Laser_Shoot16.wav"), "Bullet")
+		AudioManager.play_sound_effect(laser_shoot_sfx, "Bullet")
 
 func _shoot_shadow_bullets(bullet_scene: PackedScene, bullet_speed: float, bullet_damage: int) -> void:
 	var angle_step: float = 360.0 / float(shadow_bullet_count)

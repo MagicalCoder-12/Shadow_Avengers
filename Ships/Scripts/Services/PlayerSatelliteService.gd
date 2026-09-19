@@ -44,6 +44,10 @@ func add_satellites_from_selection() -> void:
 
 	for i in range(2):
 		var satellite_id := _get_selected_satellite_id(i)
+		if satellite_id.is_empty() or not _is_satellite_unlocked(satellite_id):
+			# Locked satellites must never render (e.g. before the shop
+			# tutorial hands the player their first drone).
+			continue
 		var satellite_scene: PackedScene = satellite_scenes.get(satellite_id)
 		if satellite_scene:
 			add_satellite(satellite_scene, i)
@@ -136,6 +140,17 @@ func calculate_satellite_offset(position_index: int) -> Vector2:
 			satellite_bounds = _get_satellite_visual_bounds_local(satellite)
 
 	return _calculate_satellite_position_for_bounds(satellite_bounds, ship_bounds, position_index)
+
+func _is_satellite_unlocked(satellite_id: String) -> bool:
+	if satellite_id.is_empty():
+		return false
+	if _game_manager and _game_manager.player_manager and _game_manager.player_manager.has_method("is_satellite_unlocked"):
+		return bool(_game_manager.player_manager.call("is_satellite_unlocked", satellite_id))
+	if _game_manager and _game_manager.satellites is Array:
+		for satellite in _game_manager.satellites:
+			if satellite is Dictionary and str(satellite.get("id", "")) == satellite_id:
+				return bool(satellite.get("unlocked", false))
+	return false
 
 func _get_selected_satellite_id(index: int) -> String:
 	var satellite_id := "Satellite1"
