@@ -407,6 +407,15 @@ func _on_boss_defeated() -> void:
 
 func _on_unlock_shadow_mode() -> void:
 	unlock_shadow_mode()
+	# Guided-campaign players get the staged Shadow Drive lesson (map intro ->
+	# level 6 charge -> activation card). Established profiles keep the
+	# original one-off popup.
+	if TutorialManager != null and TutorialManager.has_method("notify_shadow_mode_unlocked"):
+		TutorialManager.notify_shadow_mode_unlocked()
+		if TutorialManager.get_campaign_stage() in ["shadow_map_intro", "shadow_charge_explained", "shadow_activated"]:
+			shadow_mode_tutorial_shown = true
+			gm.save_progress_if_enabled()
+			return
 	if not shadow_mode_tutorial_shown:
 		_show_shadow_mode_tutorial()
 

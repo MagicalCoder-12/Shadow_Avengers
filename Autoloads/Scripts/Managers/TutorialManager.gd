@@ -105,7 +105,7 @@ func on_map_ready() -> void:
 		"level1_entry":
 			_show_step("map_level1", {"text": "Your fighter is stronger now. Select Level 1—the real operation starts here.", "status": "Tap Level 1.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "LevelButtons/LevelButton1"})
 		"shadow_map_intro":
-			_show_step("shadow_map", {"text": "Shadow Drive unlocked. In Level 6, destroy enemies to fill its gauge, then release it when READY.", "status": "Tap NEXT to continue.", "completion": "continue", "next_stage": "shadow_charge_explained", "allow_player_input": false, "dim_amount": 0.5, "allow_skip": false})
+			_show_step("shadow_map", _shadow_intro_step_def())
 
 ## Step 1 of the shop visit: highlight the resource bar so the player connects
 ## the payout they just earned with the upgrade they are about to buy. Without
@@ -229,16 +229,46 @@ func on_intern_menu_ready(menu: Node) -> void:
 		return
 	_show_step("wheel_intro", {"text": "Fortune Wheel unlocked. Claim a reward, then the galaxy is yours to explore.", "status": "Tap NEXT to open it.", "completion": "continue", "next_stage": STAGE_COMPLETE, "allow_player_input": false, "dim_amount": 0.5, "allow_skip": false, "open_wheel": menu})
 
-func begin_shadow_unlock_flow() -> bool:
-	if not is_new_player_campaign_active():
-		return false
+func _shadow_intro_step_def() -> Dictionary:
+	return {"text": "Shadow Drive unlocked. In Level 6, destroy enemies to fill its gauge, then release it when READY.", "status": "Tap NEXT to continue.", "completion": "continue", "next_stage": "shadow_charge_explained", "allow_player_input": false, "dim_amount": 0.5, "allow_skip": false}
+
+func _shadow_level6_step_def() -> Dictionary:
+	return {"text": "Destroy enemies to charge Shadow Drive. When the gauge reads READY, we will activate it together.", "status": "Tap NEXT, then fill the gauge.", "completion": "continue", "allow_player_input": false, "dim_amount": 0.46, "allow_skip": false}
+
+## Profiles that opted into the guided campaign. Deliberately NOT
+## is_new_player_campaign_active(): the shadow lesson happens at level 5, by which
+## point the main campaign has already reached "complete".
+func _campaign_eligible() -> bool:
+	return SaveManager != null and bool(SaveManager.tutorial_state.get("eligible_for_automatic_tutorials", false))
+
+## Called when the level-5 boss unlocks Shadow Drive. Arms the intro card; it is
+## shown on the next map visit (on_map_ready) or when level 6 starts, so the
+## unlock never interrupts the boss-clear sequence.
+func notify_shadow_mode_unlocked() -> void:
+	if not _campaign_eligible():
+		return
+	if SaveManager.is_tutorial_completed(SHADOW_MODE_ID):
+		return
+	var stage := get_campaign_stage()
+	if stage in SHADOW_STAGES:
+		return
 	_set_stage("shadow_map_intro")
-	GameManager.change_scene(GameManager.get_map_scene_path())
-	return true
+
+func begin_shadow_unlock_flow() -> bool:
+	## Kept for callers that want the lesson armed explicitly. It no longer forces
+	## a scene change: the card appears on the map or at the start of level 6.
+	if not _campaign_eligible():
+		return false
+	notify_shadow_mode_unlocked()
+	return get_campaign_stage() == "shadow_map_intro"
 
 func start_shadow_level_six() -> void:
-	if get_campaign_stage() == "shadow_charge_explained":
-		_show_step("shadow_level6", {"text": "Destroy enemies to charge Shadow Drive. When the gauge reads READY, we will activate it together.", "status": "Tap NEXT, then fill the gauge.", "completion": "continue", "allow_player_input": false, "dim_amount": 0.46, "allow_skip": false})
+	match get_campaign_stage():
+		"shadow_map_intro":
+			# The player went straight into level 6 without visiting the map.
+			_show_step("shadow_map", _shadow_intro_step_def())
+		"shadow_charge_explained":
+			_show_step("shadow_level6", _shadow_level6_step_def())
 
 func notify_shadow_ready() -> void:
 	if get_campaign_stage() != "shadow_charge_explained" or not _active_id.is_empty():
@@ -365,6 +395,11 @@ func _show_chained_step(stage: String) -> void:
 		"shop_upgrade":
 			# Reached when the player taps NEXT on the payout reveal.
 			_show_step("shop_upgrade", _shop_upgrade_step_def())
+		"shadow_charge_explained":
+			# Follows the intro card. On the map the charge lesson waits for
+			# level 6; inside level 6 it starts immediately.
+			if int(GameManager.get_current_level()) == 6:
+				_show_step("shadow_level6", _shadow_level6_step_def())
 		"level0_powerup":
 			_show_step("level0_powerup", {
 				"text": "Collect power cores to increase your firepower during this mission.",
@@ -419,6 +454,11 @@ const _IN_PROGRESS_LEVEL_STAGES: Array[String] = [
 	"level0_revive",
 ]
 
+## Shadow Drive stages. They belong to a guided lesson that happens at level 5
+## - long after the main campaign reaches "complete" - so they are tracked
+## separately from the shop flow.
+const SHADOW_STAGES: Array[String] = ["shadow_map_intro", "shadow_charge_explained", "shadow_activated"]
+
 const _IN_PROGRESS_MAP_STAGES: Array[String] = [
 	"shop_entry", "shop_upgrade", "shop_satellite_tab", "shop_satellite_upgrade", "shop_exit",
 	"level1_entry", "level1_playing", "wheel_intro",
@@ -445,8 +485,9 @@ func _validate_tutorial_state() -> void:
 	if _is_in_progress_level_stage(stage) and stage != "level0_intro":
 		_set_stage("level0_intro")
 	
-	# Stuck mid-shop or mid-gameplay tutorial — reset to shop entry.
-	if stage in _IN_PROGRESS_MAP_STAGES and stage != "shop_entry":
+	# Stuck mid-shop tutorial — reset to shop entry. Shadow stages are excluded:
+	# they run long after the shop flow and must survive a restart.
+	if stage in _IN_PROGRESS_MAP_STAGES and stage != "shop_entry" and not (stage in SHADOW_STAGES):
 		_set_stage("shop_entry")
 
 func _get_guide_portrait() -> Texture2D:
