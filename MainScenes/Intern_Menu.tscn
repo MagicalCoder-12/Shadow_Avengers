@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://db76ybegj7ain" path="res://MainScenes/wheel.tscn" id="6_8w1gi"]
 [ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Backward_BTN.png" id="9_aue4b"]
 [ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png" id="10_nlsn1"]
-[ext_resource type="PackedScene" uid="uid://cm88dqm28c6tb" path="res://UI/TutorialOverlay.tscn" id="11_nlsn1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wtw7j"]
 
@@ -162,9 +161,6 @@ stretch_mode = 0
 
 [node name="Wheel" parent="." unique_id=1155124203 instance=ExtResource("6_8w1gi")]
 visible = false
-layout_mode = 1
-
-[node name="TutorialOverlay" parent="." unique_id=1683281594 instance=ExtResource("11_nlsn1")]
 layout_mode = 1
 
 [connection signal="pressed" from="Wheelbutton" to="." method="_on_wheelbutton_pressed"]
