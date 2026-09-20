@@ -2,39 +2,48 @@ extends Node
 ## Single source of truth for every debug-only subsystem: the profiler overlay,
 ## runtime probes, god mode, dev-win / easy-win helpers and verbose debug logging.
 ##
-## A debug export reports OS.is_debug_build() == true; a release export reports
-## false. Every gate below therefore goes dark in a shipping build even if a
-## toggle in the editor (GameManager.debug_mode, allow_god_mode, enable_dev_win)
-## was left switched on.
+## The gate is the BUILD TYPE and nothing else. A debug export reports
+## OS.is_debug_build() == true, a release export reports false, so a shipping
+## build carries no cheats, no profiler and no debug logging even when a toggle in
+## the editor (GameManager.debug_mode, allow_god_mode, enable_dev_win) was left
+## switched on, and even when a stray SHADOW_DEBUG / FENNARA_RT_SPEC environment
+## variable happens to exist on the machine that exported it.
 ##
-## Opting an export in explicitly:
-##   * custom feature "debug_tools" enables the full toolkit (cheats included),
-##   * custom feature "profiler" enables instrumentation only (overlay/probes),
-##     which is what the "Android Profiler" export preset sets.
-## The production preset sets neither, so its build is clean.
+## Profiling (the on-device overlay + probe scripts) additionally needs an
+## explicit opt-in so a plain debug build does not draw a button over the game:
+##   * custom feature "profiler" (the "Android Profiler" export preset), or
+##   * SHADOW_PROFILER_FORCE=1 when running from the editor.
+## Both are ANDed with the debug build check, so neither can reach players.
 ##
 ## Usage:
 ##     if not DebugFlags.enabled:
 ##         return
+##     DebugFlags.debug_print("breadcrumb")
 
-## Full toolkit: profiler overlay, probes, god mode, dev-win, resource grants
-## and verbose debug logging. True only in a debug build (or an explicit opt-in).
+## Full toolkit: profiler overlay, probes, god mode, dev-win, resource grants.
+## True only inside a debug build.
 var enabled: bool = false
 
-## Read-only instrumentation (profiler overlay + probes). Never grants cheats,
-## so a profiling export of a release build still measures but cannot cheat.
+## Read-only instrumentation (profiler overlay + probe scripts). Never grants
+## cheats, and is impossible outside a debug build.
 var profiling: bool = false
 
 
 func _ready() -> void:
-	enabled = OS.is_debug_build() or OS.has_feature("debug_tools") \
-			or OS.get_environment("SHADOW_DEBUG") == "1"
-	profiling = enabled or OS.has_feature("profiler")
+	enabled = OS.is_debug_build()
+	profiling = enabled and (
+		OS.has_feature("profiler") or OS.get_environment("SHADOW_PROFILER_FORCE") == "1"
+	)
 	if not enabled:
 		set_process(false)
 		set_physics_process(false)
-	# Disabling the node also stops the profiler overlay from being built in a
-	# release build, since it checks `profiling` in its own _ready().
+
+
+## Prints only from a debug build. Every debug breadcrumb in the game routes
+## through here, so a release log stays clean.
+func debug_print(message: Variant = "") -> void:
+	if enabled:
+		print(message)
 
 
 ## Guard helper for call sites that want a single line and a breadcrumb.

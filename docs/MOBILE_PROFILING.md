@@ -2,11 +2,20 @@
 
 ## Setup (one-time, done)
 
-- **Export preset "Android Profiler"** (`export_presets.cfg` preset.1) carries the `profiler`
-  custom feature. The `MobileProfiler` overlay autoload activates only when that feature is
-  present (or `SHADOW_PROFILER_FORCE=1` on desktop), so the production AAB has zero footprint.
-- Production preset "Android" (preset.0) is untouched and exports an AAB without the overlay.
-- Test-ad IDs are used in debug builds, so measurements are not skewed by real ads.
+- **Build type is the gate.** `DebugFlags.enabled` is `OS.is_debug_build()` and nothing else:
+  cheats, dev-win, debug logging and the profiler are impossible in a release build, even if the
+  editor toggles (`debug_mode`, `allow_god_mode`, `enable_dev_win`) were left switched on.
+  `debug_mode` is a property whose setter re-checks the gate, so no runtime assignment can
+  re-enable debug output in a release binary either.
+- **Profiling additionally needs an opt-in**, so a plain debug build stays clean:
+  the `profiler` custom feature (`export_presets.cfg` preset.1 "Android Profiler") or
+  `SHADOW_PROFILER_FORCE=1` on desktop. Both are ANDed with the debug-build check.
+  Export the "Android Profiler" preset as a **Debug** export — profiling a Release export is
+  deliberately not possible any more.
+- Production preset "Android" (preset.0) exports an AAB with no overlay and no debug output.
+- Ads: `addons/AdmobPlugin/export.cfg` sets `is_real=true`, so debug and release builds both
+  carry the production AdMob app id (a test app id in a shipping build is a policy problem).
+  For ad testing, set `is_real=false` in that file locally — it is gitignored on purpose.
 - `addons/AdmobPlugin/export.cfg` supplies the AdMob APPLICATION_ID at export time — without it
   the Google Ads SDK init-provider hard-crashes the app on launch.
 

@@ -232,7 +232,7 @@ func _on_level_loaded(_level_num: int) -> void:
 # === PAUSE TOGGLE & TWEEN ===
 func _toggle_pause_menu():
 	if has_completed_level:
-		print("level completed")
+		DebugFlags.debug_print("level completed")
 		return
 	if get_tree().paused:
 		get_tree().paused = false
@@ -374,19 +374,19 @@ func _on_wave_manager_all_waves_cleared():
 			is_boss_wave = true
 		
 		if is_boss_wave:
-			print("Level.gd: Boss wave cleared, checking if first time completion")
+			DebugFlags.debug_print("Level.gd: Boss wave cleared, checking if first time completion")
 			# Check if this is the first time completing this boss level
 			var boss_levels_completed = GameManager.save_manager.boss_levels_completed
 			var is_first_time = not boss_levels_completed.has(current_level_num)
 			
 			if is_first_time:
-				print("Level.gd: First time boss completion, showing boss clear UI")
+				DebugFlags.debug_print("Level.gd: First time boss completion, showing boss clear UI")
 				_show_boss_clear_ui()
 			else:
-				print("Level.gd: Boss already completed before, showing normal level completed UI")
+				DebugFlags.debug_print("Level.gd: Boss already completed before, showing normal level completed UI")
 				_show_level_completed_ui()
 		else:
-			print("Level.gd: Non-boss wave cleared, completing level through LevelManager")
+			DebugFlags.debug_print("Level.gd: Non-boss wave cleared, completing level through LevelManager")
 			# Call LevelManager.complete_level instead of emitting signal directly
 			if current_level_num == 0 and TutorialManager.complete_level_zero():
 				return
@@ -411,7 +411,7 @@ func _on_boss_defeated() -> void:
 			# For subsequent completions, show normal level completed screen
 			_show_level_completed_ui()
 	else:
-		print("Level.gd: Revive pending, ignoring boss defeat")
+		DebugFlags.debug_print("Level.gd: Revive pending, ignoring boss defeat")
 
 func _show_boss_clear_ui():
 	get_tree().paused = false

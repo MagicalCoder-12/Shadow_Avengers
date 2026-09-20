@@ -34,8 +34,9 @@ func _ready() -> void:
 	# Zero footprint unless this is a debug/profiling build. DebugFlags.profiling
 	# is false in any release export that did not opt into the "profiler" or
 	# "debug_tools" custom feature, so the overlay cannot reach players.
-	var forced := OS.get_environment("SHADOW_PROFILER_FORCE") == "1"
-	if not DebugFlags.profiling and not forced:
+	# DebugFlags.profiling already requires a debug build, so nothing here can
+	# bring the overlay into a release binary.
+	if not DebugFlags.profiling:
 		queue_free()
 		return
 	layer = 128

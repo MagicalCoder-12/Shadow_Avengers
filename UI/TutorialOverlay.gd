@@ -158,7 +158,7 @@ func _setup_spotlight(step: Dictionary) -> void:
 		_callout_text = status_txt if not status_txt.is_empty() else str(step.get("text", ""))
 	_resolve_candidate()
 	_layout_spotlight()
-	print("[TUTORIAL] spotlight candidates=%s hole=%s" % [str(_candidates), str(_last_hole)])
+	DebugFlags.debug_print("[TUTORIAL] spotlight candidates=%s hole=%s" % [str(_candidates), str(_last_hole)])
 
 ## Resolves the first VISIBLE candidate target and switches to it when it
 ## changes (e.g. BUY hides after purchase, so the spotlight moves to the

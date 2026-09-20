@@ -92,7 +92,11 @@ const SATELLITE_ASCENSION_THRESHOLDS: Dictionary = {
 }
 
 # Debug/Developer settings
-@export var debug_mode: bool = false  # Centralized debug flag — all scripts should reference this
+# Centralized debug flag. Every debug print in the game reads this, so it is a
+# property: the setter refuses to turn on outside a debug build, which means no
+# runtime (or serialized) assignment can re-enable debug output in a release
+# binary. Kept exported so it can still be toggled while developing.
+@export var debug_mode: bool = false: set = set_debug_mode
 var enable_dev_win: bool = false  # Debug utility: instant level completion. Dev-only; callers must enable explicitly.
 @export var allow_god_mode: bool = true
 const GOD_MODE_DAMAGE_MULTIPLIER: int = 10
@@ -334,6 +338,11 @@ func request_shadow_mode_deactivate_silent(_source: String = "") -> void:
 		shadow_mode_state.shadow_mode_remaining_time = 0.0
 		if shadow_mode_timer:
 			shadow_mode_timer.stop()
+
+func set_debug_mode(value: bool) -> void:
+	# Assignment inside the setter writes the backing field, no recursion.
+	debug_mode = value and DebugFlags.enabled
+
 
 ## Debug-only surfaces are hard-off unless this is a debug build.
 func _apply_debug_gates() -> void:
@@ -870,9 +879,9 @@ func dev_win() -> void:
 		# 3. Trigger level completion through LevelManager
 		# This will: emit victory_pose, show UI, calculate score, transition, etc.
 		level_manager.complete_level(current_level)
-		print("[DEV_WIN] Level %d completed" % current_level)
+		DebugFlags.debug_print("[DEV_WIN] Level %d completed" % current_level)
 	else:
-		print("[DEV_WIN] Not in a level (level=%d), ignoring dev_win request" % current_level)
+		DebugFlags.debug_print("[DEV_WIN] Not in a level (level=%d), ignoring dev_win request" % current_level)
 
 # Helper to clear enemies and bullets for clean level completion
 func _clear_all_enemies_and_bullets() -> void:
@@ -891,4 +900,4 @@ func _clear_all_enemies_and_bullets() -> void:
 		if boss and is_instance_valid(boss):
 			boss.queue_free()
 
-	print("[DEV_WIN] Cleared enemies and bullets")
+	DebugFlags.debug_print("[DEV_WIN] Cleared enemies and bullets")

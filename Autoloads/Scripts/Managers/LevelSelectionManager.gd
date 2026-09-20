@@ -103,7 +103,7 @@ func _get_enemy_file_path_for_difficulty(difficulty_name: String) -> String:
 func _load_enemy_data_from_file(file_path: String) -> Dictionary:
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	if file == null:
-		print("LevelSelectionManager: Failed to open file %s" % file_path)
+		DebugFlags.debug_print("LevelSelectionManager: Failed to open file %s" % file_path)
 		return {}
 
 	var json_string = file.get_as_text()
@@ -111,7 +111,7 @@ func _load_enemy_data_from_file(file_path: String) -> Dictionary:
 
 	var json = JSON.new()
 	if json.parse(json_string) != OK:
-		print("LevelSelectionManager: Failed to parse JSON from %s" % file_path)
+		DebugFlags.debug_print("LevelSelectionManager: Failed to parse JSON from %s" % file_path)
 		return {}
 
 	if json.data is Dictionary:

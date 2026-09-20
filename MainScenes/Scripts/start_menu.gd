@@ -15,10 +15,14 @@ func _ready() -> void:
 
 	
 func _on_start_button_pressed() -> void:
-	if LevelManager.completed_levels.has(0):
-		GameManager.change_scene(INTERN_MENU)
-	else:
+	# Level 0 is the guided tutorial sortie. It is only reachable while the
+	# campaign is actually sitting at its intro; once it has been cleared (or the
+	# campaign has moved on) Start goes to the level menu, so a finished player is
+	# never dropped back into the tutorial level.
+	if TutorialManager.should_route_to_level_zero():
 		GameManager.change_scene(TUTORIAL_LEVEL)
+	else:
+		GameManager.change_scene(INTERN_MENU)
 
 
 func _on_exit_pressed() -> void:

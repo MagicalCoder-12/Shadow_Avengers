@@ -95,6 +95,11 @@ func complete_level_zero() -> bool:
 		return false
 	_set_stage("shop_entry")
 	_clear_overlay(true)
+	# Level.gd hands level 0 to this function and returns before its own
+	# complete_level call, so without this the tutorial sortie would never be
+	# recorded as cleared and Start would keep dropping the player back into it.
+	GameManager.mark_level_completed_if_needed(0)
+	GameManager.save_progress_if_enabled()
 	GameManager.change_scene(GameManager.get_map_scene_path())
 	return true
 

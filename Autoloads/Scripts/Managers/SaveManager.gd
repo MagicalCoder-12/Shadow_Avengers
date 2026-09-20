@@ -720,13 +720,18 @@ func get_level_star(level_num: int) -> int:
 
 # Debug function to check all tracked completions
 func debug_print_completions() -> void:
+	# Early return (instead of gating each print) so the "%s" % array formatting
+	# below is never evaluated in a release build - it would raise a formatting
+	# error there even with the output suppressed.
+	if not DebugFlags.enabled:
+		return
 	print("=== SaveManager Debug ===")
-	print("levels_completed_easy: %s" % levels_completed_easy)
-	print("levels_completed_normal: %s" % levels_completed_normal)
-	print("levels_completed_hard: %s" % levels_completed_hard)
-	print("level_highest_difficulty: %s" % level_highest_difficulty)
-	print("normal_globally_unlocked: %s" % normal_globally_unlocked)
-	print("hard_globally_unlocked: %s" % hard_globally_unlocked)
+	print("levels_completed_easy: %s" % [levels_completed_easy])
+	print("levels_completed_normal: %s" % [levels_completed_normal])
+	print("levels_completed_hard: %s" % [levels_completed_hard])
+	print("level_highest_difficulty: %s" % [level_highest_difficulty])
+	print("normal_globally_unlocked: %s" % [normal_globally_unlocked])
+	print("hard_globally_unlocked: %s" % [hard_globally_unlocked])
 	print("=========================")
 
 # Check if a level is completed in a specific difficulty

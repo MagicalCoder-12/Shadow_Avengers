@@ -95,7 +95,7 @@ func _apply_boss_rewards() -> void:
 		var is_first_time = not GameManager.is_boss_level_completed(current_level)
 		
 		if is_first_time:
-			print("[BossClear Debug] First time completing boss level %d, applying rewards" % current_level)
+			DebugFlags.debug_print("[BossClear Debug] First time completing boss level %d, applying rewards" % current_level)
 			# Add the special boss rewards only for first time
 			GameManager.add_currency("void_shards", rewards.void_shards)
 			GameManager.add_currency("coins", rewards.coins)
@@ -104,7 +104,7 @@ func _apply_boss_rewards() -> void:
 			# Mark this boss level as completed
 			GameManager.mark_boss_level_completed(current_level)
 		else:
-			print("[BossClear Debug] Boss level %d already completed before")
+			DebugFlags.debug_print("[BossClear Debug] Boss level %d already completed before")
 		
 		# Also add any collected coins and crystals from the level (if any)
 		var collected_coins = GameManager.coins_collected_this_level if GameManager else 0
