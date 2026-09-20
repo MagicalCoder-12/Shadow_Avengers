@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c6wmarnxxuujd"
-path="res://.godot/imported/Backward_BTN.png-88849140a1256a685b996ac337dc226f.ctex"
+path="res://.godot/imported/Backward_BTN.png-59e5db80d12c9c7b254e199341c536e1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png"
-dest_files=["res://.godot/imported/Backward_BTN.png-88849140a1256a685b996ac337dc226f.ctex"]
+source_file="res://Assets/UI/Main_Menu/BTNs_Active/Backward_BTN.png"
+dest_files=["res://.godot/imported/Backward_BTN.png-59e5db80d12c9c7b254e199341c536e1.ctex"]
 
 [params]
 

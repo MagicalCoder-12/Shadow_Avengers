@@ -1,16 +1,16 @@
 [gd_scene format=3 uid="uid://dula0etnafhc4"]
 
 [ext_resource type="Script" uid="uid://cubfji48ol10x" path="res://MainScenes/Scripts/shop.gd" id="1_q5gon"]
-[ext_resource type="Texture2D" uid="uid://jfjmhs2pyri8" path="res://Autoloads/Scripts/Main_Menu/Header.png" id="2_ptxh7"]
-[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Backward_BTN.png" id="3_2la7e"]
+[ext_resource type="Texture2D" uid="uid://jfjmhs2pyri8" path="res://Assets/UI/Main_Menu/Header.png" id="2_ptxh7"]
+[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Assets/UI/Main_Menu/BTNs/Backward_BTN.png" id="3_2la7e"]
 [ext_resource type="Texture2D" uid="uid://biq8fbg117e6u" path="res://Assets/Props/Crystal_02.png" id="4_12ylb"]
-[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png" id="4_b3jih"]
+[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Assets/UI/Main_Menu/BTNs_Active/Backward_BTN.png" id="4_b3jih"]
 [ext_resource type="Texture2D" uid="uid://bqdkp3crtf771" path="res://Assets/UI/Coins_01_256x256_021.png" id="4_ofht4"]
 [ext_resource type="Texture2D" uid="uid://t51lykfpluh0" path="res://Assets/UI/Coins_01_64x64_001.png" id="6_mu4dw"]
 [ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="8_x3jga"]
-[ext_resource type="Texture2D" uid="uid://cdoua3rmc0hwg" path="res://Autoloads/Scripts/Main_Menu/Shop_Cristal_Icon_02.png" id="9_vehok"]
+[ext_resource type="Texture2D" uid="uid://cdoua3rmc0hwg" path="res://Assets/UI/Main_Menu/Shop_Cristal_Icon_02.png" id="9_vehok"]
 [ext_resource type="FontFile" uid="uid://dj8ta7d86erin" path="res://Assets/fonts/IBMPlexSansJP-SemiBold.ttf" id="10_jeakh"]
-[ext_resource type="Texture2D" uid="uid://brlinyw3kiffu" path="res://Autoloads/Scripts/Main_Menu/Shop_Cristal_Icon_01.png" id="11_4exel"]
+[ext_resource type="Texture2D" uid="uid://brlinyw3kiffu" path="res://Assets/UI/Main_Menu/Shop_Cristal_Icon_01.png" id="11_4exel"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t3pkw"]
 

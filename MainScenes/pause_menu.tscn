@@ -2,13 +2,13 @@
 
 [ext_resource type="FontFile" uid="uid://bhr2rhqo8dmnd" path="res://Assets/fonts/Kenney Future.ttf" id="1_2bqot"]
 [ext_resource type="Script" uid="uid://bptacu8jbop6p" path="res://MainScenes/Scripts/pause_menu.gd" id="1_o6gag"]
-[ext_resource type="Texture2D" uid="uid://d2tjgyu02wyvf" path="res://Autoloads/Scripts/Main_Menu/BTNs/Menu_BTN.png" id="4_76x6h"]
-[ext_resource type="Texture2D" uid="uid://crf8s3lmcu0hn" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Menu_BTN.png" id="5_6hcxi"]
-[ext_resource type="Texture2D" uid="uid://dewo0xtvh0h3g" path="res://Autoloads/Scripts/Main_Menu/BTNs/Play_BTN.png" id="5_qajlh"]
-[ext_resource type="Texture2D" uid="uid://cplo7hlkir3ii" path="res://Autoloads/Scripts/Main_Menu/BTNs/Replay_BTN.png" id="6_fyikt"]
+[ext_resource type="Texture2D" uid="uid://d2tjgyu02wyvf" path="res://Assets/UI/Main_Menu/BTNs/Menu_BTN.png" id="4_76x6h"]
+[ext_resource type="Texture2D" uid="uid://crf8s3lmcu0hn" path="res://Assets/UI/Main_Menu/BTNs_Active/Menu_BTN.png" id="5_6hcxi"]
+[ext_resource type="Texture2D" uid="uid://dewo0xtvh0h3g" path="res://Assets/UI/Main_Menu/BTNs/Play_BTN.png" id="5_qajlh"]
+[ext_resource type="Texture2D" uid="uid://cplo7hlkir3ii" path="res://Assets/UI/Main_Menu/BTNs/Replay_BTN.png" id="6_fyikt"]
 [ext_resource type="FontFile" uid="uid://cqf01fb53lw23" path="res://Assets/fonts/Kenney Future Narrow.ttf" id="6_m6edi"]
-[ext_resource type="Texture2D" uid="uid://dqf0v7qw74n2c" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Play_BTN.png" id="6_ymyhq"]
-[ext_resource type="Texture2D" uid="uid://bvp1csfyerbbp" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Replay_BTN.png" id="8_kbjg0"]
+[ext_resource type="Texture2D" uid="uid://dqf0v7qw74n2c" path="res://Assets/UI/Main_Menu/BTNs_Active/Play_BTN.png" id="6_ymyhq"]
+[ext_resource type="Texture2D" uid="uid://bvp1csfyerbbp" path="res://Assets/UI/Main_Menu/BTNs_Active/Replay_BTN.png" id="8_kbjg0"]
 
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7t4i0"]

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://jinuo75d44cf"
-path="res://.godot/imported/resied _button.png-8267cb2993f01d8ecd0eebf62e8febf7.ctex"
+path="res://.godot/imported/resied _button.png-3acb2049d2b6a51da8f2b92034aa5dad.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/resied _button.png"
-dest_files=["res://.godot/imported/resied _button.png-8267cb2993f01d8ecd0eebf62e8febf7.ctex"]
+source_file="res://Assets/UI/Main_Menu/resied _button.png"
+dest_files=["res://.godot/imported/resied _button.png-3acb2049d2b6a51da8f2b92034aa5dad.ctex"]
 
 [params]
 

@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bx73ulrlv6qed" path="res://MainScenes/Scripts/authentication.gd" id="1_7cwmy"]
 [ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="1_0424m"]
 [ext_resource type="Theme" uid="uid://cajsdr5l6wc4w" path="res://Space.tres" id="2_mrds1"]
-[ext_resource type="Texture2D" uid="uid://b41nqh802bkwl" path="res://Autoloads/Scripts/Main_Menu/BTNs/Google_BTN.png" id="3_8a06j"]
-[ext_resource type="Texture2D" uid="uid://sxlsjrnvh51q" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Google_BTN.png" id="5_5gcmp"]
+[ext_resource type="Texture2D" uid="uid://b41nqh802bkwl" path="res://Assets/UI/Main_Menu/BTNs/Google_BTN.png" id="3_8a06j"]
+[ext_resource type="Texture2D" uid="uid://sxlsjrnvh51q" path="res://Assets/UI/Main_Menu/BTNs_Active/Google_BTN.png" id="5_5gcmp"]
 
 
 [sub_resource type="LabelSettings" id="LabelSettings_es60m"]

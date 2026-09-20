@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwqayejk161mh"
-path="res://.godot/imported/Upgrade_BTN.png-75bfd4323ac0f8dfbc50025e38008d0c.ctex"
+path="res://.godot/imported/Upgrade_BTN.png-691061194d27fe03abd8282b18347dca.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/BTNs/Upgrade_BTN.png"
-dest_files=["res://.godot/imported/Upgrade_BTN.png-75bfd4323ac0f8dfbc50025e38008d0c.ctex"]
+source_file="res://Assets/UI/Main_Menu/BTNs/Upgrade_BTN.png"
+dest_files=["res://.godot/imported/Upgrade_BTN.png-691061194d27fe03abd8282b18347dca.ctex"]
 
 [params]
 

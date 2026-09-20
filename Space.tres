@@ -1,9 +1,9 @@
 [gd_resource type="Theme" format=3 uid="uid://cajsdr5l6wc4w"]
 
 [ext_resource type="Texture2D" uid="uid://lf0pxp54ed0a" path="res://Assets/UI/Table_02.png" id="1_ghrth"]
-[ext_resource type="Texture2D" uid="uid://cqlr1yf4h5ome" path="res://Autoloads/Scripts/Main_Menu/Window_2.png" id="2_343iq"]
+[ext_resource type="Texture2D" uid="uid://cqlr1yf4h5ome" path="res://Assets/UI/Main_Menu/Window_2.png" id="2_343iq"]
 [ext_resource type="Texture2D" uid="uid://coaoqlirx4xt3" path="res://Assets/UI/Window.png" id="3_tcbhi"]
-[ext_resource type="Texture2D" uid="uid://cks8mcb4kaw4g" path="res://Autoloads/Scripts/Main_Menu/Table_03.png" id="4_a3x7b"]
+[ext_resource type="Texture2D" uid="uid://cks8mcb4kaw4g" path="res://Assets/UI/Main_Menu/Table_03.png" id="4_a3x7b"]
 [ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="5_7kx3s"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_q4qn1"]

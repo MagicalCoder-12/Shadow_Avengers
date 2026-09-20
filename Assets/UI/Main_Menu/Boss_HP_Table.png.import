@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bbnphfgxxxjn6"
-path="res://.godot/imported/Boss_HP_Table.png-27428aa6876ffc3d094116e79da7798d.ctex"
+path="res://.godot/imported/Boss_HP_Table.png-c0f26b8da0716112fd3e22bad47ee75a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/Boss_HP_Table.png"
-dest_files=["res://.godot/imported/Boss_HP_Table.png-27428aa6876ffc3d094116e79da7798d.ctex"]
+source_file="res://Assets/UI/Main_Menu/Boss_HP_Table.png"
+dest_files=["res://.godot/imported/Boss_HP_Table.png-c0f26b8da0716112fd3e22bad47ee75a.ctex"]
 
 [params]
 

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d0hfl38rap3wf"
-path="res://.godot/imported/Pause_BTN.png-846d2208b067de90c85149bfeb71d3c1.ctex"
+path="res://.godot/imported/Pause_BTN.png-784a3ad1b97799fc26231ccd1db3b3a9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/BTNs/Pause_BTN.png"
-dest_files=["res://.godot/imported/Pause_BTN.png-846d2208b067de90c85149bfeb71d3c1.ctex"]
+source_file="res://Assets/UI/Main_Menu/BTNs/Pause_BTN.png"
+dest_files=["res://.godot/imported/Pause_BTN.png-784a3ad1b97799fc26231ccd1db3b3a9.ctex"]
 
 [params]
 

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://uclkg2jwuduf" path="res://HUD/ShadowModeButton.gd" id="1_shadow"]
 [ext_resource type="Texture2D" uid="uid://bsc7wxa30tblr" path="res://Assets/guibuttons/BlackButton-Active.png" id="2_2egk6"]
 [ext_resource type="Texture2D" uid="uid://c4so8sombbim3" path="res://Assets/guibuttons/BlueButton-Hover.png" id="3_i3h5r"]
-[ext_resource type="Texture2D" uid="uid://jinuo75d44cf" path="res://Autoloads/Scripts/Main_Menu/resied _button.png" id="4_ba1i1"]
+[ext_resource type="Texture2D" uid="uid://jinuo75d44cf" path="res://Assets/UI/Main_Menu/resied _button.png" id="4_ba1i1"]
 [ext_resource type="Texture2D" uid="uid://ba8v6jremmj86" path="res://Assets/guibuttons/BlueButton-Active.png" id="5_gbckn"]
 [ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="6_doa7v"]
 

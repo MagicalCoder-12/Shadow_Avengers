@@ -5,9 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://wo8cmhmmr7wt" path="res://Assets/guibuttons/BlackButton-Hover.png" id="3_85rsd"]
 [ext_resource type="Script" uid="uid://bqn10imwib5pi" path="res://Levels/Scripts/level_button.gd" id="4_85rsd"]
 [ext_resource type="FontFile" uid="uid://bhr2rhqo8dmnd" path="res://Assets/fonts/Kenney Future.ttf" id="4_kx6qo"]
-[ext_resource type="Texture2D" uid="uid://dba0rmsg4y3m8" path="res://Autoloads/Scripts/Main_Menu/Star_01.png" id="6_6mehl"]
-[ext_resource type="Texture2D" uid="uid://c633vxal7qtrd" path="res://Autoloads/Scripts/Main_Menu/Star_02.png" id="7_kunq0"]
-[ext_resource type="Texture2D" uid="uid://dewuheq0cmgte" path="res://Autoloads/Scripts/Main_Menu/Star_03.png" id="8_vtmnr"]
+[ext_resource type="Texture2D" uid="uid://dba0rmsg4y3m8" path="res://Assets/UI/Main_Menu/Star_01.png" id="6_6mehl"]
+[ext_resource type="Texture2D" uid="uid://c633vxal7qtrd" path="res://Assets/UI/Main_Menu/Star_02.png" id="7_kunq0"]
+[ext_resource type="Texture2D" uid="uid://dewuheq0cmgte" path="res://Assets/UI/Main_Menu/Star_03.png" id="8_vtmnr"]
 
 
 [sub_resource type="LabelSettings" id="LabelSettings_7imot"]

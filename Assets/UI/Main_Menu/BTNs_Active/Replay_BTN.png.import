@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bvp1csfyerbbp"
-path="res://.godot/imported/Replay_BTN.png-30d6c0b10002762ab7c4346af27f110f.ctex"
+path="res://.godot/imported/Replay_BTN.png-90abb61274836839853cedff08c500f9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Replay_BTN.png"
-dest_files=["res://.godot/imported/Replay_BTN.png-30d6c0b10002762ab7c4346af27f110f.ctex"]
+source_file="res://Assets/UI/Main_Menu/BTNs_Active/Replay_BTN.png"
+dest_files=["res://.godot/imported/Replay_BTN.png-90abb61274836839853cedff08c500f9.ctex"]
 
 [params]
 

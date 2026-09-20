@@ -7,12 +7,12 @@
 [ext_resource type="FontFile" uid="uid://cqf01fb53lw23" path="res://Assets/fonts/Kenney Future Narrow.ttf" id="3_fqewj"]
 [ext_resource type="Texture2D" uid="uid://bo1qg7o4h20wu" path="res://Assets/guibuttons/YellowButton-Active.png" id="4_fqewj"]
 [ext_resource type="Texture2D" uid="uid://brytcb4y2wjx7" path="res://Assets/guibuttons/YellowButton-Hover.png" id="5_cxxqj"]
-[ext_resource type="Texture2D" uid="uid://d2tjgyu02wyvf" path="res://Autoloads/Scripts/Main_Menu/BTNs/Menu_BTN.png" id="5_fqewj"]
-[ext_resource type="Texture2D" uid="uid://crf8s3lmcu0hn" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Menu_BTN.png" id="6_cxxqj"]
+[ext_resource type="Texture2D" uid="uid://d2tjgyu02wyvf" path="res://Assets/UI/Main_Menu/BTNs/Menu_BTN.png" id="5_fqewj"]
+[ext_resource type="Texture2D" uid="uid://crf8s3lmcu0hn" path="res://Assets/UI/Main_Menu/BTNs_Active/Menu_BTN.png" id="6_cxxqj"]
 [ext_resource type="Texture2D" uid="uid://bsc7wxa30tblr" path="res://Assets/guibuttons/BlackButton-Active.png" id="6_oypef"]
 [ext_resource type="Texture2D" uid="uid://wo8cmhmmr7wt" path="res://Assets/guibuttons/BlackButton-Hover.png" id="7_hpmds"]
-[ext_resource type="Texture2D" uid="uid://dnpcvc0hqf6d0" path="res://Autoloads/Scripts/Main_Menu/BTNs/Forward_BTN.png" id="9_wx5qn"]
-[ext_resource type="Texture2D" uid="uid://cf2u1w86trya3" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Forward_BTN.png" id="10_0jvw8"]
+[ext_resource type="Texture2D" uid="uid://dnpcvc0hqf6d0" path="res://Assets/UI/Main_Menu/BTNs/Forward_BTN.png" id="9_wx5qn"]
+[ext_resource type="Texture2D" uid="uid://cf2u1w86trya3" path="res://Assets/UI/Main_Menu/BTNs_Active/Forward_BTN.png" id="10_0jvw8"]
 
 
 [sub_resource type="LabelSettings" id="LabelSettings_mvld5"]

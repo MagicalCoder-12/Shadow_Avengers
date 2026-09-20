@@ -2,8 +2,8 @@
 
 [ext_resource type="FontFile" uid="uid://5oy6sd0yjonu" path="res://Assets/fonts/IBMPlexSansJP-Bold.ttf" id="1_iyifa"]
 [ext_resource type="Script" uid="uid://bqkg4ldou0mvy" path="res://MainScenes/Scripts/credits.gd" id="1_yoknb"]
-[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Autoloads/Scripts/Main_Menu/BTNs/Backward_BTN.png" id="2_ukugg"]
-[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Autoloads/Scripts/Main_Menu/BTNs_Active/Backward_BTN.png" id="3_vf16b"]
+[ext_resource type="Texture2D" uid="uid://bwmjfy57rbo8p" path="res://Assets/UI/Main_Menu/BTNs/Backward_BTN.png" id="2_ukugg"]
+[ext_resource type="Texture2D" uid="uid://c6wmarnxxuujd" path="res://Assets/UI/Main_Menu/BTNs_Active/Backward_BTN.png" id="3_vf16b"]
 
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_30l4y"]
