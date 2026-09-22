@@ -11,11 +11,14 @@ const SAVE_SCHEMA_VERSION: int = 3
 # First satellite the new-player campaign hands out. Enforcing its locked state
 # keeps the shop's BUY button on screen until the player buys it.
 const FIRST_SATELLITE_ID: String = "Satellite1"
-# Campaign checkpoints reached only after the satellite has been purchased and
-# equipped. Older saves past these points are left exactly as they are.
-const STAGES_AFTER_SATELLITE_EQUIP: Array = [
-	"shop_exit", "level1_entry", "level1_playing", "wheel_intro",
-	"shadow_map_intro", "shadow_charge_explained", "shadow_activated", "complete",
+# Campaign checkpoints that can only be reached AFTER the first satellite has
+# been bought (shop_satellite_equip is set by the purchase itself; everything
+# past it follows). Older saves stopped at any of these are left as they are -
+# the satellite they paid for is never re-locked.
+const STAGES_SATELLITE_ALREADY_OWNED: Array = [
+	"shop_satellite_equip", "shop_exit", "level1_entry", "level1_playing",
+	"wheel_intro", "shadow_map_intro", "shadow_charge_explained",
+	"shadow_activated", "complete",
 ]
 
 # Default resource values for new or reset progress
@@ -487,14 +490,21 @@ func _apply_data_validation() -> void:
 func _migrate_tutorial_satellite_lock() -> void:
 	if not bool(tutorial_state.get("eligible_for_automatic_tutorials", false)):
 		return
-	if get_tutorial_campaign_stage() in STAGES_AFTER_SATELLITE_EQUIP:
+	if get_tutorial_campaign_stage() in STAGES_SATELLITE_ALREADY_OWNED:
 		return
 	for satellite in gm.satellites:
 		if not (satellite is Dictionary):
 			continue
 		if str(satellite.get("id", "")) != FIRST_SATELLITE_ID:
 			continue
-		if bool(satellite.get("unlocked", false)):
+		# The satellite BUY step needs the satellite locked, but a player who
+		# already bought it must keep it - re-locking a bought satellite
+		# dead-ended the flow when the app restarted mid-visit. `purchased` is
+		# the durable marker written by UpgradeTransactionService; for saves made
+		# before that marker existed, any upgrade bought after the purchase is
+		# the same proof (satellites progress through `upgrade_count`).
+		var purchased: bool = bool(satellite.get("purchased", false)) or int(satellite.get("upgrade_count", 0)) > 0
+		if bool(satellite.get("unlocked", false)) and not purchased:
 			satellite["unlocked"] = false
 			push_warning("Tutorial migration: locked %s so the shop keeps offering BUY." % FIRST_SATELLITE_ID)
 

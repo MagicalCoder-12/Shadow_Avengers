@@ -14,7 +14,6 @@ autostart = true
 
 [node name="Admob" type="Node" parent="." unique_id=1686134296]
 script = ExtResource("2_40v6j")
-is_real = true
 max_ad_content_rating = 1
 child_directed = 0
 under_age_of_consent = 0

@@ -16,6 +16,20 @@ var _slow_motion_active: bool = false
 var _previous_time_scale: float = 1.0
 var _clearing: bool = false  # True while a fade-out is in progress
 
+## Every stage that describes the player currently being INSIDE the shop
+## visit (between the map spotlight and the exit). One list, used by
+## can_open_shop(), on_map_ready() and on_shop_ready() so they can never
+## disagree again - that disagreement was the restart soft-lock.
+const SHOP_STAGES: Array = [
+	"shop_entry", "shop_reward", "shop_upgrade", "shop_satellite_tab",
+	"shop_satellite_upgrade", "shop_satellite_equip", "shop_exit",
+]
+
+## Set the first time the tutorial spends a free recovery on the player. The
+## lesson happens once; afterwards level 0 deaths use the normal game-over and
+## revive flow.
+const REVIVE_LESSON_TAUGHT_FLAG: String = "level0_revive_taught"
+
 func get_campaign_stage() -> String:
 	if SaveManager and SaveManager.has_method("get_tutorial_campaign_stage"):
 		return SaveManager.get_tutorial_campaign_stage()
@@ -30,8 +44,7 @@ func should_route_to_level_zero() -> bool:
 func can_open_shop() -> bool:
 	if not is_new_player_campaign_active():
 		return true
-	var stage := get_campaign_stage()
-	return stage in ["shop_entry", "shop_reward", "shop_satellite_equip"]
+	return get_campaign_stage() in SHOP_STAGES
 
 func can_upgrade_in_shop() -> bool:
 	if not is_new_player_campaign_active():
@@ -76,12 +89,20 @@ func notify_pickup_collected(_kind: String) -> void:
 func handle_tutorial_death(player: Node) -> bool:
 	if get_campaign_stage() == STAGE_COMPLETE or int(GameManager.get_current_level()) != 0 or not is_instance_valid(player):
 		return false
+	# The free recovery is the tutorial's one-off lesson, not a general rule for
+	# level 0. Once it has been taught, later deaths must run the real game-over
+	# flow - hijacking them made the player immortal in level 0 and left lives
+	# out of sync with the HUD, because the free revive and a paid revive could
+	# each write their own value.
+	if SaveManager.get_tutorial_flag(REVIVE_LESSON_TAUGHT_FLAG):
+		return false
 	if player.has_method("set_lives"):
 		player.call("set_lives", 3)
 	if player.has_method("_play_death_animation"):
 		player.call("_play_death_animation")
 	if player.has_method("revive"):
 		player.call("revive", 3)
+	SaveManager.set_tutorial_flag(REVIVE_LESSON_TAUGHT_FLAG)
 	if _active_id.is_empty():
 		_show_step("level0_revive", {
 			"text": "Emergency recovery engaged. I restored your fighter this time, Shadow pilot—but do not rely on it in combat.",
@@ -106,6 +127,12 @@ func complete_level_zero() -> bool:
 func on_map_ready() -> void:
 	match get_campaign_stage():
 		"shop_entry", "shop_reward", "shop_upgrade", "shop_satellite_tab", "shop_satellite_upgrade", "shop_satellite_equip", "shop_exit":
+			# After an app restart the saved stage may point at a step whose
+			# shop UI died with the previous process. Rewind to the start of
+			# the shop visit so the flow re-runs from a coherent point; the
+			# satellite-lock migration keeps the BUY button available.
+			if get_campaign_stage() != "shop_entry":
+				_set_stage("shop_entry")
 			_show_step("map_shop", {"text": "Training complete. Open the Ship Hanger To upgrade ship.", "status": "Tap SHOP.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "CanvasLayer/Shop"})
 		"level1_entry":
 			_show_step("map_level1", {"text": "Your fighter is stronger now. Select Level 1—the real operation starts here.", "status": "Tap Level 1.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "LevelButtons/LevelButton1"})
@@ -155,11 +182,20 @@ func on_shop_ready(shop: Node) -> void:
 		if cost > 0:
 			GameManager.add_currency("coins", cost)
 		SaveManager.set_tutorial_flag("shop_investment_granted")
+	# Re-present the step that belongs to the CURRENT stage. A restart can
+	# drop the player here at any shop stage (the overlay itself died with
+	# the old process), so every stage must have a live step waiting.
 	match get_campaign_stage():
 		"shop_reward":
 			_show_step("shop_reward", _shop_reward_step_def())
+		"shop_satellite_tab":
+			_show_step("shop_satellite_tab", {"text": "Ship upgraded. Now open the Satellites panel to equip a companion drone.", "status": "Tap SATELLITES.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/Bottom_ui/Bottom/HBoxContainer/Satellites"})
+		"shop_satellite_upgrade":
+			_show_step("shop_satellite_upgrade", {"text": "Select a satellite and upgrade it to boost your firepower.", "status": "Tap the BUY button.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_paths": [{"path": "UI/Buy_Ascend/Buy", "status": "Tap the BUY button."}, {"path": "UI/HBoxContainer/Upgrade_coins", "status": "Use the coin upgrade button."}]})
 		"shop_satellite_equip":
 			_show_step("shop_satellite_equip", _shop_satellite_equip_step_def())
+		"shop_exit":
+			_show_step("shop_exit", {"text": "Satellite equipped. Leave the Ship Bay and begin Level 1.", "status": "Tap BACK.", "completion": "external", "allow_player_input": true, "dim_amount": 0.35, "allow_skip": false, "target_path": "UI/Bottom_ui/Bottom/HBoxContainer/Back"})
 		_:
 			_show_step("shop_upgrade", _shop_upgrade_step_def())
 

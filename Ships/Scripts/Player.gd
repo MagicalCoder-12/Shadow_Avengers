@@ -341,7 +341,12 @@ func damage(amount: int) -> void:
 		return
 
 	combat_service.save_current_stats(GameManager)
-	lives = combat_service.update_lives_after_damage(GameManager, lives, amount)
+	# update_lives_after_damage writes GameManager.player_lives, whose setter
+	# emits on_player_life_changed - handlers may legitimately change lives
+	# during that signal (e.g. the tutorial auto-revive). GameManager is the
+	# single source of truth, so read back instead of using the stale return.
+	combat_service.update_lives_after_damage(GameManager, lives, amount)
+	lives = GameManager.player_lives
 	_debug_log("Player damaged, lives: " + str(lives))
 
 	if lives > 0:

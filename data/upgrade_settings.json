@@ -71,6 +71,15 @@
 		"Ship7": ["Tenebris Fang", "Shadow Blade", "Darkness Cutter", "Void Ripper", "Abyssal Slicer", "Nightmare Edge", "Spectral Razor"],
 		"Ship8": ["Void Serpent", "Cosmic Cobra", "Stellar Python", "Galactic Anaconda", "Infinity Wyrm"]
 	},
+
+	"satellite_evolution_names": {
+		"Satellite1": ["Orbital Guardian", "Cosmic Sentinel", "Galactic Warden"],
+		"Satellite2": ["Pulsar Companion", "Nebula Satellite", "Stellar Anchor"],
+		"Satellite3": ["Quantum Echo", "Phase Satellite", "Dimensional Beacon"],
+		"Satellite4": ["Solar Flare", "Corona Satellite", "Helios Guardian"],
+		"Satellite5": ["Lunar Shield", "Tidal Satellite", "Moonbeam Sentinel"],
+		"Satellite6": ["Astral Link", "Spirit Satellite", "Ethereal Beacon"]
+	},
 	
 	"satellite_crystal_cost": 30,
 	"satellite_coin_cost": 500,

@@ -20,7 +20,7 @@ text = "[center]
 
 [color=#aaaaaa]Clear a level in[/color] [color=#6ec1ff][b]Normal[/b][/color]
 [color=#aaaaaa]to gain access to[/color]
-[color=#ff5555][b]Hard Mode[/b][/color] —Only for pro players 🫡👑.
+[color=#ff5555][b]Hard Mode[/b][/color] —Only for pro players .
 [/center]"
 
 [node name="title" parent="color_rect" parent_id_path=PackedInt32Array(1111894450) index="1" unique_id=91882184]

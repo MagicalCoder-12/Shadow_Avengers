@@ -120,7 +120,7 @@ func try_purchase_unlock(game_manager, item: Dictionary, currency_type: String =
 
 	var cost: int = int(item.get("purchase_cost", 0))
 	if cost <= 0:
-		item["unlocked"] = true
+		_mark_purchased(item)
 		save_progress(game_manager)
 		return {
 			"ok": true,
@@ -138,7 +138,7 @@ func try_purchase_unlock(game_manager, item: Dictionary, currency_type: String =
 		}
 
 	deduct_currency(game_manager, cost, currency_type)
-	item["unlocked"] = true
+	_mark_purchased(item)
 	save_progress(game_manager)
 	return {
 		"ok": true,
@@ -146,3 +146,13 @@ func try_purchase_unlock(game_manager, item: Dictionary, currency_type: String =
 		"currency_type": currency_type,
 		"cost": cost
 	}
+
+## Unlocking an item and having bought it are different facts: `unlocked`
+## only says it is usable right now, while `purchased` is the durable record
+## that crystals were spent on it. The tutorial's satellite-lock migration
+## reads `purchased` to decide whether it may re-lock the first satellite for
+## the BUY step - without this key it re-locked already-bought satellites
+## after a restart and the player lost the purchase.
+func _mark_purchased(item: Dictionary) -> void:
+	item["unlocked"] = true
+	item["purchased"] = true
