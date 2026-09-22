@@ -92,13 +92,14 @@ const SATELLITE_ASCENSION_THRESHOLDS: Dictionary = {
 }
 
 # Debug/Developer settings
-# Centralized debug flag. Every debug print in the game reads this, so it is a
-# property: the setter refuses to turn on outside a debug build, which means no
-# runtime (or serialized) assignment can re-enable debug output in a release
-# binary. Kept exported so it can still be toggled while developing.
+# Debug Mode is the SINGLE toggle for every developer-only feature: verbose
+# debug logging, god mode, dev-win, and all editor shortcuts. It is a
+# pass-through of the build-type gate (DebugFlags.enabled): a release export
+# reports is_debug_build() == false, so Debug Mode - and therefore every cheat
+# behind it - cannot be enabled there, no matter what a save file, a serialized
+# scene, or runtime code does. Switching it off also instantly deactivates god
+# mode. Kept exported so it can still be toggled while developing.
 @export var debug_mode: bool = false: set = set_debug_mode
-var enable_dev_win: bool = false  # Debug utility: instant level completion. Dev-only; callers must enable explicitly.
-@export var allow_god_mode: bool = true
 const GOD_MODE_DAMAGE_MULTIPLIER: int = 10
 const GOD_MODE_RESOURCE_AMOUNT: int = 99999
 var god_mode_enabled: bool = false
@@ -341,24 +342,24 @@ func request_shadow_mode_deactivate_silent(_source: String = "") -> void:
 
 func set_debug_mode(value: bool) -> void:
 	# Assignment inside the setter writes the backing field, no recursion.
+	# God mode rides this same toggle, so flipping Debug Mode off disarms it.
 	debug_mode = value and DebugFlags.enabled
+	if not debug_mode and god_mode_enabled:
+		set_god_mode_enabled(false, "debug_mode_off")
 
 
 ## Debug-only surfaces are hard-off unless this is a debug build.
 func _apply_debug_gates() -> void:
-	var debug_build: bool = DebugFlags.enabled
-	debug_mode = debug_mode and debug_build
-	enable_dev_win = enable_dev_win and debug_build
-	allow_god_mode = allow_god_mode and debug_build
+	debug_mode = debug_mode and DebugFlags.enabled
 
 func can_use_god_mode() -> bool:
-	return allow_god_mode and DebugFlags.enabled
+	return debug_mode
 
 func is_god_mode_active() -> bool:
-	return allow_god_mode and god_mode_enabled and DebugFlags.enabled
+	return debug_mode and god_mode_enabled
 
 func set_god_mode_enabled(enabled: bool, _source: String = "") -> void:
-	var next_state := enabled and allow_god_mode and DebugFlags.enabled
+	var next_state := enabled and debug_mode
 	if god_mode_enabled == next_state:
 		return
 
@@ -857,9 +858,9 @@ func _on_prepare_map_scene() -> void:
 	pass
 
 # Debug utility: instantly complete the current level
-# Only active when enable_dev_win is true (development/debug mode)
+# Only active when Debug Mode is on (debug builds only)
 func dev_win() -> void:
-	if not enable_dev_win or not DebugFlags.enabled:
+	if not debug_mode:
 		return
 
 	# Only process if we're in a level scene

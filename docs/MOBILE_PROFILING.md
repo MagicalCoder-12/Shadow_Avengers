@@ -3,10 +3,11 @@
 ## Setup (one-time, done)
 
 - **Build type is the gate.** `DebugFlags.enabled` is `OS.is_debug_build()` and nothing else:
-  cheats, dev-win, debug logging and the profiler are impossible in a release build, even if the
-  editor toggles (`debug_mode`, `allow_god_mode`, `enable_dev_win`) were left switched on.
+  cheats, dev-win, debug logging and the profiler are impossible in a release build, even if
+  the editor's single **Debug Mode** toggle (`GameManager.debug_mode`) was left switched on.
   `debug_mode` is a property whose setter re-checks the gate, so no runtime assignment can
-  re-enable debug output in a release binary either.
+  re-enable debug output in a release binary either. God Mode, dev-win and all editor
+  shortcuts are merged under this one toggle — see `docs/DEBUG_MODE.md`.
 - **Profiling additionally needs an opt-in**, so a plain debug build stays clean:
   the `profiler` custom feature (`export_presets.cfg` preset.1 "Android Profiler") or
   `SHADOW_PROFILER_FORCE=1` on desktop. Both are ANDed with the debug-build check.

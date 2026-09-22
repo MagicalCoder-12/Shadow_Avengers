@@ -5,7 +5,7 @@ extends Node
 ## The gate is the BUILD TYPE and nothing else. A debug export reports
 ## OS.is_debug_build() == true, a release export reports false, so a shipping
 ## build carries no cheats, no profiler and no debug logging even when a toggle in
-## the editor (GameManager.debug_mode, allow_god_mode, enable_dev_win) was left
+## the editor's single Debug Mode toggle (GameManager.debug_mode) was left
 ## switched on, and even when a stray SHADOW_DEBUG / FENNARA_RT_SPEC environment
 ## variable happens to exist on the machine that exported it.
 ##

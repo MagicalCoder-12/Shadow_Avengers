@@ -16,13 +16,14 @@ flowchart TD
 	D --> E[Coin and power-up pickup lessons]
 	E --> F[Unlimited tutorial revives]
 	F --> G[Level 0 complete]
-	G --> H[Map: guided Shop visit]
-	H --> I[Grant first upgrade cost and require upgrade]
-	I --> J[Map: guide player into Level 1]
-	J --> K[Level 1: real game begins]
-	K --> L[Return to main/intermediate menu]
-	L --> M[Fortune Wheel unlocked]
-	M --> N[Campaign complete]
+	G --> H[Map: reward reveal on the resource bar]
+	H --> I[Map/Shop: guided Buy, Select and Equip of Satellite 1]
+	I --> J[Shop: first coin upgrade]
+	J --> K[Map: guide player into Level 1]
+	K --> L[Level 1: real game begins]
+	L --> M[Return to main/intermediate menu]
+	M --> N[Fortune Wheel unlocked]
+	N --> O[Campaign complete]
 ```
 
 ## Eligibility and persistence
@@ -35,18 +36,26 @@ flowchart TD
 - Save after every completed stage, upgrade grant, and unlock transition.
 - Scene changes and app restarts resume the next unfinished safe stage; they must not repeat an already completed lesson.
 
-Recommended campaign stages:
+Campaign stages as implemented (`TutorialManager`):
 
 ```text
 level0_intro
-level0_first_bullet
-level0_coin_pickup
-level0_powerup_pickup
-level0_complete
+level0_bullet
+level0_coin
+level0_combat
+level0_powerup
+level0_revive
 shop_entry
+shop_reward
 shop_upgrade
+shop_satellite_tab
+shop_satellite_upgrade
+shop_satellite_equip
+shop_exit
+shop_investment_granted
+level1_start
+level1_playing
 level1_entry
-level1_complete
 wheel_intro
 complete
 ```
@@ -69,7 +78,7 @@ It must provide:
 - Avatar dialogue, typewriter text, Next, Skip, dimmer, target highlight, arrow, and optional time slow/pause.
 - Input gating: permit only the required player action or UI control during directed steps.
 - Safe pause handling that does not open the normal pause menu.
-- A target-control mode for map, Shop, and Shadow Mode button prompts.
+- A target-control mode for map, Shop, and Shadow Mode button prompts (spotlight: the screen dims **except** for a hole around the target; touches inside the hole pass through to the real button — the full-screen blocking overlay was replaced by this).
 - A tutorial-protected Level 0 mode that suppresses ordinary Game Over.
 - Event subscriptions that disconnect on scene change or tutorial completion.
 
@@ -86,6 +95,10 @@ Level 0 is a dedicated scripted mission, not a normal replayable level.
 7. Finish the scripted wave and transition to the map.
 
 Only marked tutorial drops should trigger these lessons. Random drops must not interrupt the mission.
+
+### One-time routing (implemented)
+
+Completing Level 0 records the clear (`completed_levels` gets `0`) before the map loads, and the Start button routes on the live campaign request (`TutorialManager.should_route_to_level_zero()`) instead of a completion flag. A finished campaign therefore can never re-enter the tutorial level, and level 0 locks itself after the clear.
 
 ### Tutorial death and revive
 
@@ -112,18 +125,17 @@ Add narrow events instead of having the tutorial scan arbitrary scene nodes.
 | `ship_stats_updated` | Existing `GameManager` signal | Detect maximum firepower/Overclock |
 | `tutorial_upgrade_completed` | Upgrade transaction service | Advance guided Shop step |
 
-## Guided map and Shop sequence
+## Guided map and Shop sequence (as implemented)
 
-After Level 0:
+After Level 0 the spotlight chain walks the player through the real economy, Clash-of-Clans style (dimmed screen, hole on the target, bobbing arrow, callout text):
 
-1. Return to the map and highlight the Shop button. Disable or block unrelated navigation.
-2. Enter the Shop and select the intended first ship upgrade.
-3. Grant exactly the missing amount needed for that upgrade, once. New-player starting resources should be reviewed so the grant feels like an intentional initial investment rather than surplus currency.
-4. Lock unrelated purchases until the required upgrade succeeds.
-5. Highlight the Shop exit/back button.
-6. On the map, allow only Level 1 and explain that the real game begins.
+1. **Reward reveal** — shop opens with the resource bar highlighted and a live callout of the exact payout (`+N coins, +N crystals`), so the upgrade prompt has context.
+2. **Coin upgrade** — spotlight the coin upgrade button; the grant persists before purchase so a restart cannot duplicate it.
+3. **Satellite tab** → **Buy** → **Select/Equip** — Satellite 1 is forced locked while the campaign is unfinished (`SaveManager._normalize_loaded_state()` migrates stale saves that recorded it unlocked), so the real flow is Buy → Select → Equip and the exit line "Satellite equipped" is true.
+4. **Exit** — spotlight the Back button.
+5. On the map, allow only Level 1 and explain that the real game begins.
 
-The upgrade grant must be persisted before purchase so restart/reload cannot duplicate it.
+Unrelated purchases stay locked until the guided step succeeds.
 
 ## Overclock lesson
 
@@ -133,13 +145,13 @@ When the player collects the final Attack Boost and reaches the cap for the firs
 
 1. Slow time and highlight the full power-symbol row.
 2. Explain: damage cannot increase past Overclock; later Attack Boost pickups become score.
-3. Mark `overclock_explained` complete.
+3. Mark `overclock_explained` complete (shown once; the flag is persisted and never repeated).
 
 Gameplay change required: if an Attack Boost is collected at the cap, award a configurable `overclock_score_reward` and show score feedback. It must not merely discard the pickup.
 
-## Shadow Mode tutorial
+## Shadow Mode tutorial (wired)
 
-Replace the current text-only Level 5 tutorial with a two-part guided sequence for eligible new profiles.
+The chain is connected to the real unlock: finishing Level 5 (boss on the final WaveConfig) arms `shadow_map_intro` through `LevelManager._on_unlock_shadow_mode()`, and the sequence survives both level-completion routes.
 
 ### After Level 5
 
@@ -164,8 +176,12 @@ On the first Level 1 completion while `campaign_stage = "level1_entry"`:
 
 1. Return to the main/intermediate menu instead of leaving the player in the normal level loop.
 2. Unlock the Fortune Wheel with a new persisted unlock flag if one does not already exist.
-3. Show one short Wheel introduction.
+3. Show one short Wheel introduction (card renders; NEXT opens the wheel).
 4. Set `campaign_stage = "complete"` and release the player into normal progression.
+
+## Scene-change safety
+
+`SceneManager.change_scene()` queues requests that arrive while a loader is still alive (newest wins, duplicates ignored). Tutorial-driven navigation can therefore no longer be lost to a fast double-tap or a transition race.
 
 ## Implementation order
 
@@ -188,3 +204,4 @@ On the first Level 1 completion while `campaign_stage = "level1_entry"`:
 - Extra Attack Boosts at Overclock award score instead of damage.
 - The Shop grant cannot be duplicated with restart or repeated menu entry.
 - Shadow Mode can still be used normally after its first guided activation.
+- Level 0 can never be replayed once the campaign has moved past it (Start routes on the campaign request).
