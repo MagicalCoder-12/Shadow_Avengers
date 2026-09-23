@@ -96,22 +96,28 @@ func complete_level(current_level: int) -> void:
 	# Increment completion count regardless of whether it's first time
 	increment_level_completion_count(current_level)
 
+	var is_first_time_completion: bool = not completed_levels.has(current_level)
+
 	# Only add to completed levels if not already completed
-	if not completed_levels.has(current_level):
+	if is_first_time_completion:
 		completed_levels.append(current_level)
-		gm.level_star_earned.emit(current_level)
 		gm.save_progress_if_enabled()
-		
+
 		# Check if level 10 is completed for the first time to unlock difficulty selection
 		if current_level == 10:
 			_unlock_difficulty_selection()
-		
+
 		# Check and update difficulty tier completion
 		_check_tier_completion()
-	
+
 	# Track difficulty-specific level completion (ALWAYS track, even if level was already completed)
-	# This tracks the highest difficulty completed for each level
+	# This tracks the highest difficulty completed for each level.
+	# It must run before level_star_earned so star listeners (map) read fresh data.
 	_track_difficulty_completion(current_level)
+
+	if is_first_time_completion:
+		gm.level_star_earned.emit(current_level)
+		gm.save_progress_if_enabled()
 	
 	if current_level == 20 and gm and gm.save_manager:
 		var hard_is_globally_unlocked: bool = gm.save_manager.is_hard_globally_unlocked()
@@ -423,4 +429,3 @@ func _exit_tree() -> void:
 	# Disconnect any connected signals to prevent memory leaks
 	# Note: In autoloads, this is rarely called, but good practice
 	pass
-

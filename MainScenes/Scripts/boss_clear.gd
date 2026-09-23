@@ -164,6 +164,7 @@ func _play_sound_effect(sound_type: String) -> void:
 # Add a method to show the boss clear screen
 func show_boss_clear():
 	if not screen_shown:
+		_refresh_current_level_from_game()
 		# Apply the boss rewards
 		_apply_boss_rewards()
 		
@@ -199,15 +200,33 @@ func _on_map_pressed() -> void:
 		_commit_boss_level_completion_if_needed()
 		GameManager.change_scene(GameManager.get_map_scene_path())
 
+func _refresh_current_level_from_game() -> void:
+	if not GameManager:
+		return
+	var live_level: int = GameManager.get_current_level()
+	# get_current_level() parses the current scene path and returns 0 outside
+	# level scenes (e.g. BossClear._ready running before the level is current).
+	# Only accept positive values so a stale _ready-time read never overwrites
+	# the real boss level (5, 10, 15, 20) with 0.
+	if live_level > 0:
+		current_level = live_level
+
 func _commit_boss_level_completion_if_needed() -> void:
 	if not GameManager:
+		return
+	_refresh_current_level_from_game()
+	if current_level <= 0:
 		return
 	if not GameManager.is_level_completed(current_level):
 		GameManager.complete_level(current_level)
 
 func _on_restart_pressed() -> void:
 	if GameManager:
+		_commit_boss_level_completion_if_needed()
 		GameManager.is_paused = false
 		GameManager.reset_game()
+		_refresh_current_level_from_game()
+		if current_level <= 0:
+			return
 		var current_level_path = "res://Levels/level_%d.tscn" % current_level
 		GameManager.change_scene(current_level_path)

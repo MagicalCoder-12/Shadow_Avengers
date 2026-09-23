@@ -127,6 +127,8 @@ func spawn_formation(config: WaveConfig) -> void:
 		print("  Type: ", FormationEnums.FormationType.keys()[current_wave_config.formation_type])
 		print("  Pattern: ", FormationEnums.EntryPattern.keys()[current_wave_config.entry_pattern])
 		print("  Enemy Type: ", current_wave_config.get_enemy_type_key())
+		if not current_wave_config.slot_enemy_types.is_empty():
+			print("  Slot Types: ", current_wave_config.slot_enemy_types)
 		print("  Count: ", adjusted_enemy_count)
 		print("  Difficulty: ", FormationEnums.DifficultyLevel.keys()[difficulty])
 		queue_redraw()
@@ -651,7 +653,9 @@ func _spawn_enemies_sequence(enemy_count: int) -> void:
 		print("FormationManager: All enemies spawned")
 
 func _spawn_single_enemy(index: int) -> void:
-	var enemy_scene = current_wave_config.get_enemy_scene()
+	# Mixed formations: each slot resolves its own scene/type so a wave can
+	# blend non-shooters with a few shooters.
+	var enemy_scene = current_wave_config.get_slot_enemy_scene(index)
 	
 	if not enemy_scene or not enemy_scene.can_instantiate():
 		push_error("FormationManager: Invalid enemy scene at index %d" % index)
@@ -662,7 +666,7 @@ func _spawn_single_enemy(index: int) -> void:
 		push_error("FormationManager: Enemy scene does not contain Enemy class at index %d" % index)
 		return
 		
-	var script_override: Script = _resolve_enemy_script_override(current_wave_config.enemy_type)
+	var script_override: Script = _resolve_enemy_script_override(current_wave_config.get_slot_enemy_type(index))
 	if script_override and enemy.get_script() != script_override:
 		enemy.set_script(script_override)
 		
@@ -782,6 +786,14 @@ func _create_enemy_config(index: int) -> WaveConfig:
 		config.spawn_pos = spawn_positions[index]
 	
 	config.center = current_wave_config.get_formation_center()
+	
+	# Mixed formations: this slot's stats/movement must resolve from its own
+	# type, not the wave-level one. setup_formation_entry reads the type from
+	# get_enemy_type_key(), so pin the duplicate to the slot's type.
+	var slot_type := current_wave_config.get_slot_enemy_type(index)
+	config.enemy_type = slot_type
+	if not current_wave_config.slot_enemy_types.is_empty():
+		config.slot_enemy_types = PackedInt32Array([slot_type])
 	
 	return config
 

@@ -3,9 +3,9 @@ extends TextureButton
 @onready var label: Label = $Label
 
 const Level_1 = "res://Levels/level_1.tscn"
-@onready var star_bronze: Sprite2D = $Stars/Star_bronze
-@onready var star_silver: Sprite2D = $Stars/Star_silver
-@onready var star_gold: Sprite2D = $Stars/Star_gold
+@onready var star_bronze: TextureRect = $Stars/Star_bronze
+@onready var star_silver: TextureRect = $Stars/Star_silver
+@onready var star_gold: TextureRect = $Stars/Star_gold
 
 signal level_selected(level_num: int)
 

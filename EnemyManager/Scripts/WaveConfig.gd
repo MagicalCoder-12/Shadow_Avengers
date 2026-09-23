@@ -224,6 +224,31 @@ func get_enemy_type_key() -> String:
 func set_enemy_type_from_key(enemy_key: String) -> void:
 	enemy_type = _coerce_enemy_type(enemy_key)
 
+# Per-slot enemy type override for mixed formations. When populated with one
+# FormationEnums.EnemyType entry per spawned enemy, each formation slot spawns
+# and fights as its own type (e.g. mostly FastEnemy non-shooters with a single
+# SlowShooter mixed in); empty keeps the whole wave on `enemy_type`.
+@export var slot_enemy_types: PackedInt32Array = PackedInt32Array()
+
+func get_slot_enemy_type(index: int) -> FormationEnums.EnemyType:
+	if index < slot_enemy_types.size() and ENEMY_TYPE_TO_KEY.has(slot_enemy_types[index]):
+		return slot_enemy_types[index] as FormationEnums.EnemyType
+	return enemy_type
+
+func get_slot_enemy_type_key(index: int) -> String:
+	return str(ENEMY_TYPE_TO_KEY.get(get_slot_enemy_type(index), "mob1"))
+
+func get_slot_enemy_scene(index: int) -> PackedScene:
+	if boss_scene:
+		return boss_scene
+	var enemy_key: String = get_slot_enemy_type_key(index)
+	var enemy_scene: PackedScene = _resolve_enemy_scene_for_type(enemy_key)
+	if enemy_scene:
+		return enemy_scene
+	if not ENEMY_KEY_TO_TYPE.has(enemy_key):
+		push_warning("Invalid slot enemy_type '%s' in WaveConfig. Using base enemy scene." % enemy_key)
+	return _resolve_base_enemy_scene()
+
 func get_enemy_type_display_name() -> String:
 	var key: String = get_enemy_type_key()
 	return key if not key.is_empty() else "mob1"

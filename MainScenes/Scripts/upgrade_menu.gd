@@ -39,6 +39,7 @@ const UPGRADE_UI_REFRESH_SERVICE_SCRIPT := preload("res://MainScenes/Scripts/Ser
 @onready var Coins_amt: Label = $UI/HBoxContainer/Upgrade_coins/HBoxContainer/Coins_amt
 @onready var Crystal_amt: Label = $UI/HBoxContainer/Upgrade_Crystals/HBoxContainer/Crystal_amt
 @onready var Void_Shard: Label = $UI/Buy_Ascend/Ascend/HBoxContainer/Void_Shard
+@onready var max_label: Label = $UI/HBoxContainer/MaxLabel
 
 @onready var ship_textures_ui = [
 	$UI/ShipContainer/GridContainer/Ship1/S01,
@@ -352,6 +353,8 @@ func update_ship_ui() -> void:
 		selected.hide()
 		upgrade_coins_button.hide()
 		upgrade_crystals_button.hide()
+		if max_label:
+			max_label.hide()
 		if cost <= 0:
 			buy_button.text = "Get Free Ship"
 			status_label.text = "Free Ship - Unlock Now!"
@@ -429,6 +432,8 @@ func update_satellite_ui() -> void:
 		selected.hide()
 		upgrade_coins_button.hide()
 		upgrade_crystals_button.hide()
+		if max_label:
+			max_label.hide()
 		if cost <= 0:
 			buy_button.text = "Get Free Satellite"
 			status_label.text = "Free Satellite - Unlock Now!"
@@ -499,6 +504,10 @@ func _update_upgrade_buttons_state() -> void:
 		upgrade_coins_button.disabled = false
 		upgrade_coins_button.modulate = Color.WHITE
 
+	# A ship that can still ascend is not maxed; only a fully capped ship
+	# gets the MAX treatment.
+	_update_max_level_display(is_max_level and not bool(ship.get("can_ascend", false)))
+
 func _update_satellite_upgrade_buttons_state() -> void:
 	var satellite = GameManager.satellites[selected_satellite_index]
 	var is_max_level = satellite["ascend_count"] >= satellite["max_evolution_stage"]
@@ -513,6 +522,21 @@ func _update_satellite_upgrade_buttons_state() -> void:
 		upgrade_crystals_button.modulate = Color.WHITE
 		upgrade_coins_button.disabled = false
 		upgrade_coins_button.modulate = Color.WHITE
+
+	_update_max_level_display(is_max_level and not bool(satellite.get("can_ascend", false)))
+
+## Shows a MAX label in place of the coin/crystal upgrade buttons when the
+## selected ship or satellite is fully maxed out, so the player can tell at a
+## glance that no further upgrades exist. Anything else keeps the buttons.
+func _update_max_level_display(is_maxed: bool) -> void:
+	if max_label == null:
+		return
+	if is_maxed:
+		upgrade_coins_button.hide()
+		upgrade_crystals_button.hide()
+		max_label.show()
+	else:
+		max_label.hide()
 
 func select_ship_by_name(ship_node_name: String) -> void:
 	if name_to_index.has(ship_node_name):

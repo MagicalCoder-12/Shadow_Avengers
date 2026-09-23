@@ -220,6 +220,9 @@ func _on_restart_pressed() -> void:
 	if GameManager.debug_mode:
 		print("[LevelCompleted Debug] _on_restart_pressed called")
 	if GameManager:
+		# Restarting must not drop the completion: boss levels (5, 10, 15, 20)
+		# only record completed_levels/star data on button press.
+		_commit_level_completion_if_needed()
 		GameManager.is_paused = false
 		GameManager.reset_game()
 		var current_level_path = "res://Levels/level_%d.tscn" % current_level

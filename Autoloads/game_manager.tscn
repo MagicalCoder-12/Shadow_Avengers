@@ -6,6 +6,7 @@
 
 [node name="GameManager" type="Node2D" unique_id=2082259744 groups=["GameManager"]]
 script = ExtResource("1_dmm7s")
+debug_mode = true
 upgrade_menu_scene = ExtResource("2_mx4pe")
 
 [node name="ShadowModeTimer" type="Timer" parent="." unique_id=301455201]

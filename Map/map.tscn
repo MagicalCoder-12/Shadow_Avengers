@@ -18,7 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://djv02b634b0pv" path="res://MainScenes/difficulty_selection.tscn" id="16_xoeuw"]
 [ext_resource type="PackedScene" uid="uid://cb4y2g0ulc7gu" path="res://MainScenes/difficulty_unlocked.tscn" id="17_tgjig"]
 [ext_resource type="PackedScene" uid="uid://cvp3h6kj6bqrh" path="res://MainScenes/harddifficulty_unlocked.tscn" id="18_5ps16"]
-[ext_resource type="Texture2D" path="res://Assets/Background/bg4.png" id="tex_bg4"]
+[ext_resource type="Texture2D" uid="uid://bpbn0v2fspiuu" path="res://Assets/Background/bg4.png" id="tex_bg4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_bmidu"]
 font = ExtResource("2_3g1qk")

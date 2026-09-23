@@ -15,6 +15,8 @@ enum PowerupType {
 @export var life_increase_amount: int = 1  # New: Amount to increase player life
 
 func _ready() -> void:
+	# Group makes the drop addressable for tutorial spotlight targets.
+	add_to_group("Powerup")
 	if powerup_type == PowerupType.ATTACK_BOOST:
 		TutorialManager.notify_pickup_spawned("powerup", self)
 

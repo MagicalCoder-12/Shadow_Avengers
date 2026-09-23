@@ -420,6 +420,13 @@ func _show_boss_clear_ui():
 		boss_clear.show()
 		if boss_clear.has_method("initialize"):
 			boss_clear.initialize()
+		# Level knows its own number authoritatively via the exported level_num.
+		# BossClear._ready runs during scene instantiation, potentially before
+		# this level is the current scene, so its GameManager-derived level can
+		# be stale (0). Stamp the correct value after initialize; show_boss_clear
+		# refreshes from GameManager first and keeps this fallback otherwise.
+		if "current_level" in boss_clear and level_num > 0:
+			boss_clear.current_level = level_num
 		if boss_clear.has_method("show_boss_clear"):
 			boss_clear.show_boss_clear()
 	else:

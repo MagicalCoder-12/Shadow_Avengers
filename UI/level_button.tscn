@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://c633vxal7qtrd" path="res://Assets/UI/Main_Menu/Star_02.png" id="7_kunq0"]
 [ext_resource type="Texture2D" uid="uid://dewuheq0cmgte" path="res://Assets/UI/Main_Menu/Star_03.png" id="8_vtmnr"]
 
-
 [sub_resource type="LabelSettings" id="LabelSettings_7imot"]
 font = ExtResource("4_kx6qo")
 font_size = 30
@@ -29,6 +28,7 @@ stretch_mode = 5
 script = ExtResource("4_85rsd")
 
 [node name="Label" type="Label" parent="." unique_id=1258126995]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,23 +45,53 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Stars" type="Node2D" parent="." unique_id=760466850]
-position = Vector2(88.33333, -14.166667)
+[node name="Stars" type="Control" parent="." unique_id=1853674666]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 9.1666565
+offset_top = -4.166667
+offset_right = 9.1666565
+offset_bottom = -4.166667
+grow_horizontal = 0
+mouse_filter = 2
 scale = Vector2(0.2, 0.2)
 
-[node name="Star_bronze" type="Sprite2D" parent="Stars" unique_id=699167604]
+[node name="Star_bronze" type="TextureRect" parent="Stars" unique_id=1626749000]
 visible = false
-position = Vector2(45.416668, -24.583334)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch_mode = 3
 texture = ExtResource("6_6mehl")
 
-[node name="Star_silver" type="Sprite2D" parent="Stars" unique_id=1771026496]
+[node name="Star_silver" type="TextureRect" parent="Stars" unique_id=1573377864]
 visible = false
-position = Vector2(46.249996, -25.416664)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch_mode = 3
 texture = ExtResource("7_kunq0")
 
-[node name="Star_gold" type="Sprite2D" parent="Stars" unique_id=635703703]
+[node name="Star_gold" type="TextureRect" parent="Stars" unique_id=658458199]
 visible = false
-position = Vector2(47.083332, -24.166666)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch_mode = 3
 texture = ExtResource("8_vtmnr")
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

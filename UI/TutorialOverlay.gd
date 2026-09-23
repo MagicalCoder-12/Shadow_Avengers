@@ -39,6 +39,11 @@ var _arrow: Polygon2D
 var _callout: Label
 var _callout_text := ""
 var _target_node: Control
+# World-space targets (bullets, dropped pickups) are Node2D/CanvasItems, not
+# Controls; when set, the hole tracks the node's global position each frame.
+var _target_node2d: Node2D
+var _use_world_target := false
+const WORLD_TARGET_PAD := 120.0
 var _candidates: Array[Dictionary] = []
 var _has_spotlight := false
 var _arrow_points_down := true
@@ -119,6 +124,8 @@ func present_step(step: Dictionary, portrait: Texture2D) -> void:
 ## back to the plain dimmer when there is no resolvable target.
 func _setup_spotlight(step: Dictionary) -> void:
 	_target_node = null
+	_target_node2d = null
+	_use_world_target = bool(step.get("world_target", false))
 	_has_spotlight = false
 	_dim_rig.visible = false
 	_dimmer.visible = true
@@ -166,15 +173,32 @@ func _setup_spotlight(step: Dictionary) -> void:
 func _resolve_candidate() -> bool:
 	var cs: Node = get_tree().current_scene
 	for c in _candidates:
-		var t := (cs.get_node_or_null(str(c["path"])) as Control) if cs else null
-		if t != null and t.is_visible_in_tree():
+		var p := str(c["path"])
+		var t: Node = null
+		# A path starting with "!" names a GROUP: direct reference to a live
+		# gameplay node (bullets/dropped pickups have no stable scene path).
+		if p.begins_with("!"):
+			t = get_tree().get_first_node_in_group(p.substr(1))
+		elif cs:
+			t = cs.get_node_or_null(p)
+		if t == null or not t.is_visible_in_tree():
+			continue
+		if t is Control:
 			if t != _target_node:
 				_target_node = t
+				_target_node2d = null
 				_last_hole = Rect2()
-			var st := str(c["status"])
-			if not st.is_empty():
-				_callout_text = st
-			return true
+		elif t is Node2D:
+			if t != _target_node2d:
+				_target_node2d = t
+				_target_node = null
+				_last_hole = Rect2()
+		else:
+			continue
+		var st := str(c["status"])
+		if not st.is_empty():
+			_callout_text = st
+		return true
 	return false
 
 func _layout_spotlight() -> void:
@@ -188,10 +212,14 @@ func _layout_spotlight() -> void:
 		_arrow.visible = false
 		_callout.visible = false
 		_target_node = null
+		_target_node2d = null
 		_last_hole = Rect2()
 		return
 	_border.visible = true
 	_arrow.visible = true
+	if _use_world_target and is_instance_valid(_target_node2d):
+		_layout_spotlight_world()
+		return
 	if _target_node == null or not is_instance_valid(_target_node):
 		return
 	# Work in SCREEN space: the target may live in another CanvasLayer with
@@ -262,6 +290,55 @@ func _process(delta: float) -> void:
 		_border.border_width = 5.0 + 2.0 * pulse
 		# Bob toward the button.
 		_arrow.position.y = _arrow_base_y + ARROW_BOB_AMP * sin(TAU * _time / ARROW_BOB_PERIOD) * (1.0 if _arrow_points_down else -1.0)
+
+## Screen-anchored hole around a moving gameplay node (enemy bullet, dropped
+## coin): dim bands hug the viewport edges and stay out of the player's way.
+func _layout_spotlight_world() -> void:
+	var vp := _dim_rig.size
+	var origin := Vector2.ZERO
+	var cs: Node = get_tree().current_scene
+	if cs is Node2D:
+		origin = (cs as Node2D).get_screen_transform().origin
+	var world_pos := _target_node2d.global_position
+	var center := origin + world_pos
+	var half := WORLD_TARGET_PAD
+
+	for r in _dim_rects:
+		r.visible = false
+		# Top band: covers the top edge; collapses before it swallows the card.
+		var top_h := clampf(center.y - half, 0.0, maxf(vp.y * 0.32, 0.0))
+		_dim_rects[0].position = Vector2(0, 0)
+		_dim_rects[0].size = Vector2(vp.x, top_h)
+		_dim_rects[0].visible = top_h > 0.5
+		# Bottom band: viewport bottom up to just below the hole.
+		var bot_y := center.y + half
+		_dim_rects[1].position = Vector2(0, bot_y)
+		_dim_rects[1].size = Vector2(vp.x, maxf(vp.y - bot_y, 0.0))
+		_dim_rects[1].visible = vp.y - bot_y > 0.5
+		# Side bands keep screen edges dimmed around the hole.
+		_dim_rects[2].position = Vector2(0, top_h)
+		_dim_rects[2].size = Vector2(clampf(center.x - half, 0.0, vp.x), half * 2.0)
+		_dim_rects[2].visible = center.x - half > 0.5
+		_dim_rects[3].position = Vector2(center.x + half, top_h)
+		_dim_rects[3].size = Vector2(maxf(vp.x - (center.x + half), 0.0), half * 2.0)
+		_dim_rects[3].visible = vp.x - (center.x + half) > 0.5
+
+	_border.position = center - Vector2(half, half)
+	_border.size = Vector2(half * 2.0, half * 2.0)
+	_last_hole = Rect2(center - Vector2(half, half), Vector2(half * 2.0, half * 2.0))
+
+	_arrow.position = Vector2(center.x, center.y + half + 34.0 + 4.0)
+	_arrow.scale = Vector2(1, -1)
+	if not _callout_text.is_empty():
+		_callout.visible = true
+		if _callout.text != _callout_text:
+			_callout.text = _callout_text
+			_callout.reset_size()
+		_callout.position = Vector2(
+			clampf(center.x - _callout.size.x * 0.5, 8.0, maxf(vp.x - _callout.size.x - 8.0, 8.0)),
+			clampf(center.y + half + 34.0 + 40.0, 4.0, maxf(vp.y - _callout.size.y - 4.0, 4.0)))
+	else:
+		_callout.visible = false
 
 ## Fade the whole overlay out, then report back so TutorialManager can free it.
 func fade_out_and_dismiss() -> void:

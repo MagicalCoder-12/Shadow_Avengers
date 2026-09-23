@@ -79,6 +79,9 @@ func _on_hard_pressed() -> void:
 	_update_description(FormationEnums.DifficultyLevel.HARD)
 
 func _on_back_pressed() -> void:
+	# Backing out of the picker returns to the map without starting the level;
+	# hand the campaign back to level1_entry so map gates keep working.
+	TutorialManager.notify_difficulty_cancelled()
 	hide()
 
 func _on_start_pressed() -> void:

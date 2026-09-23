@@ -368,6 +368,14 @@ text = " 50"
 label_settings = SubResource("LabelSettings_7w585")
 vertical_alignment = 1
 
+[node name="MaxLabel" type="Label" parent="UI/HBoxContainer" unique_id=192837465]
+visible = false
+layout_mode = 2
+text = "MAX"
+label_settings = SubResource("LabelSettings_wrg6i")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Buy_Ascend" type="HBoxContainer" parent="UI" unique_id=1097791753]
 anchors_preset = -1
 anchor_left = 0.044444446

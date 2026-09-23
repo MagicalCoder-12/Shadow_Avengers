@@ -223,6 +223,16 @@ func _ready() -> void:
 	if not revive_completed.is_connected(_on_revive_completed):
 		revive_completed.connect(_on_revive_completed)
 
+	# Serialized debug_mode=true (game_manager.tscn) must mean god mode is
+	# active on launch in debug builds; nothing else ever arms it otherwise.
+	# The second branch re-applies the resource grant: gate-time arming runs
+	# before SaveManager loads, so load_progress would otherwise overwrite the
+	# granted resources with on-disk values.
+	if debug_mode and not god_mode_enabled:
+		set_god_mode_enabled(true, "ready_debug_mode_on")
+	elif debug_mode and god_mode_enabled:
+		_grant_god_mode_resources()
+
 func _exit_tree() -> void:
 	# Clean up the timer to prevent memory leaks
 	if shadow_mode_timer and shadow_mode_timer.is_inside_tree():
@@ -342,10 +352,20 @@ func request_shadow_mode_deactivate_silent(_source: String = "") -> void:
 
 func set_debug_mode(value: bool) -> void:
 	# Assignment inside the setter writes the backing field, no recursion.
-	# God mode rides this same toggle, so flipping Debug Mode off disarms it.
-	debug_mode = value and DebugFlags.enabled
-	if not debug_mode and god_mode_enabled:
-		set_god_mode_enabled(false, "debug_mode_off")
+	# God mode rides this same toggle: flipping Debug Mode on arms it,
+	# flipping it off disarms it.
+	# During scene instantiation the node is outside the tree and DebugFlags
+	# may not be ready yet, so store the serialized value raw and let _ready
+	# apply the build gate. Otherwise the serialized debug_mode=true would be
+	# ANDed with a not-ready gate and permanently lost at startup.
+	if is_inside_tree():
+		debug_mode = value and DebugFlags.enabled
+		if debug_mode and not god_mode_enabled:
+			set_god_mode_enabled(true, "debug_mode_on")
+		elif not debug_mode and god_mode_enabled:
+			set_god_mode_enabled(false, "debug_mode_off")
+	else:
+		debug_mode = value
 
 
 ## Debug-only surfaces are hard-off unless this is a debug build.

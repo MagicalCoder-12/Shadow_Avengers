@@ -36,7 +36,18 @@ func get_campaign_stage() -> String:
 	return STAGE_COMPLETE
 
 func is_new_player_campaign_active() -> bool:
-	return SaveManager and bool(SaveManager.tutorial_state.get("eligible_for_automatic_tutorials", false)) and get_campaign_stage() != STAGE_COMPLETE
+	if not SaveManager:
+		return false
+	if not bool(SaveManager.tutorial_state.get("eligible_for_automatic_tutorials", false)):
+		return false
+	var stage := get_campaign_stage()
+	if stage == STAGE_COMPLETE:
+		return false
+	# Shadow Drive lesson runs at level 5, long after onboarding is done.
+	# It must never re-activate early-game gates (shop/level buttons).
+	if stage in SHADOW_STAGES:
+		return false
+	return true
 
 func should_route_to_level_zero() -> bool:
 	return is_new_player_campaign_active() and get_campaign_stage() == "level0_intro"
@@ -58,7 +69,10 @@ func can_exit_shop() -> bool:
 func can_start_level(level_num: int) -> bool:
 	if not is_new_player_campaign_active():
 		return true
-	return level_num == 1 and get_campaign_stage() == "level1_entry"
+	# Level 1 stays tappable while its difficulty panel is open (level1_playing).
+	# Otherwise backing out of the difficulty picker strands the map at
+	# level1_playing, where every gate rejects input and only Back works.
+	return level_num == 1 and get_campaign_stage() in ["level1_entry", "level1_playing"]
 
 func start_level_zero() -> bool:
 	var stage := get_campaign_stage()
@@ -68,20 +82,63 @@ func start_level_zero() -> bool:
 		return false
 	return _show_step("level0_intro", {
 		"text": "Shadow pilot, this is a beginning . Your cannons fire automatically; focus on movement and survival.",
-		"status": "Tap NEXT to deploy.", "completion": "continue", "next_stage": "level0_bullet",
+		"status": "Tap NEXT to deploy.", "completion": "continue", "next_stage": "level0_combat",
 		"allow_player_input": false, "dim_amount": 0.50, "allow_skip": false
 	})
 
-# The bullet, coin, and powerup steps are now chained sequentially via
-# next_stage in start_level_zero, so these event-driven callbacks are
-# no longer needed. They are kept as empty stubs to avoid breaking
-# existing call sites in EnemyCombatService, coins.gd, and Powerup.gd.
+# The bullet/coin/powerup steps are EVENT-DRIVEN now: instead of a slide
+# chain before combat, each lesson appears the first time the mechanic
+# actually happens in-game (first enemy bullet in flight, first coin drop,
+# first power-up drop). The teaching flag is written when the lesson FIRES,
+# so a restart replays the lesson on the next real trigger instead of
+# dangling on a dead stage. Call sites: EnemyCombatService, coins.gd,
+# Powerup.gd.
 
-func notify_enemy_bullet_spawned(_bullet: Node) -> void:
-	pass
+const ATTACK_LESSON_FLAG: String = "level0_attack_taught"
+const COIN_LESSON_FLAG: String = "level0_coin_taught"
+const POWERUP_LESSON_FLAG: String = "level0_powerup_taught"
 
-func notify_pickup_spawned(_kind: String, _pickup: Node) -> void:
-	pass
+# Stage the currently-on-screen step belongs to; guards _set_stage against
+# gameplay events that fire BEHIND an active lesson card.
+var _pending_step_stage: String = ""
+
+func notify_enemy_bullet_spawned(bullet: Node) -> void:
+	if not is_new_player_campaign_active() or int(GameManager.get_current_level()) != 0:
+		return
+	if SaveManager.get_tutorial_flag(ATTACK_LESSON_FLAG):
+		return
+	if not is_instance_valid(bullet):
+		return
+	if not _show_step("level0_attack", _attack_lesson_step_def()):
+		return
+	SaveManager.set_tutorial_flag(ATTACK_LESSON_FLAG)
+	_set_stage("level0_combat")
+	_pending_step_stage = "level0_attack"
+
+func notify_pickup_spawned(kind: String, pickup: Node) -> void:
+	if not is_new_player_campaign_active() or int(GameManager.get_current_level()) != 0:
+		return
+	if _active_id == "level0_attack":
+		return
+	match kind:
+		"coin":
+			if SaveManager.get_tutorial_flag(COIN_LESSON_FLAG) or not is_instance_valid(pickup):
+				return
+			if not _show_step("level0_coin", _coin_lesson_step_def()):
+				return
+			SaveManager.set_tutorial_flag(COIN_LESSON_FLAG)
+			_set_stage("level0_combat")
+			_pending_step_stage = "level0_coin"
+		"powerup":
+			if SaveManager.get_tutorial_flag(POWERUP_LESSON_FLAG) or not is_instance_valid(pickup):
+				return
+			if not _show_step("level0_powerup", _powerup_lesson_step_def()):
+				return
+			SaveManager.set_tutorial_flag(POWERUP_LESSON_FLAG)
+			_set_stage("level0_combat")
+			_pending_step_stage = "level0_powerup"
+		_:
+			pass
 
 func notify_pickup_collected(_kind: String) -> void:
 	pass
@@ -134,7 +191,9 @@ func on_map_ready() -> void:
 			if get_campaign_stage() != "shop_entry":
 				_set_stage("shop_entry")
 			_show_step("map_shop", {"text": "Training complete. Open the Ship Hanger To upgrade ship.", "status": "Tap SHOP.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "CanvasLayer/Shop"})
-		"level1_entry":
+		"level1_entry", "level1_playing":
+			# level1_playing is included so a map visit after backing out of
+			# the difficulty picker still coaches the tap that unblocks it.
 			_show_step("map_level1", {"text": "Your fighter is stronger now. Select Level 1—the real operation starts here.", "status": "Tap Level 1.", "completion": "external", "allow_player_input": true, "dim_amount": 0.45, "allow_skip": false, "target_path": "LevelButtons/LevelButton1"})
 		"shadow_map_intro":
 			_show_step("shadow_map", _shadow_intro_step_def())
@@ -252,6 +311,19 @@ func notify_level_selected(level_num: int) -> void:
 		_set_stage("level1_playing")
 		_clear_overlay(true)
 
+## The difficulty panel's Back button returns to the map without starting the
+## level. Without this the campaign sits at level1_playing on the map, where
+## the shop/level gates reject everything and only Back works (soft-lock).
+func notify_difficulty_cancelled() -> void:
+	if get_campaign_stage() != "level1_playing":
+		return
+	_set_stage("level1_entry")
+	_clear_overlay(true)
+	# Re-present map guidance when the picker was opened from the map.
+	var current_scene: Node = get_tree().current_scene
+	if current_scene != null and is_instance_valid(current_scene) and current_scene.has_node("LevelButtons"):
+		on_map_ready()
+
 func start_level_one() -> void:
 	if get_campaign_stage() == "level1_playing":
 		_show_step("level1_start", {"text": "This is the real fight now. Use what you learned and clear the sector.", "status": "Tap NEXT to begin.", "completion": "continue", "allow_player_input": false, "dim_amount": 0.42, "allow_skip": false})
@@ -340,7 +412,7 @@ func start_shadow_mode_tutorial() -> bool:
 ## --- Progress tracking ---
 
 const _LEVEL_ZERO_STEPS: Array[String] = [
-	"level0_intro", "level0_bullet", "level0_coin",
+	"level0_intro", "level0_attack", "level0_coin",
 	"level0_powerup", "level0_revive",
 ]
 
@@ -414,6 +486,13 @@ func _skip_active_step() -> void:
 
 func _set_stage(stage: String) -> void:
 	if SaveManager and SaveManager.has_method("set_tutorial_campaign_stage"):
+		# While a lesson step is on screen the stage already describes the live
+		# step; don't let a gameplay event behind the card overwrite it (e.g.
+		# the level-complete write racing a coin lesson's NEXT). STAGE_COMPLETE
+		# always lands: a real completion outranks the pending lesson.
+		if not _active_id.is_empty() and not _pending_step_stage.is_empty() \
+				and stage != _pending_step_stage and stage != STAGE_COMPLETE:
+			return
 		SaveManager.set_tutorial_campaign_stage(stage)
 		GameManager.save_progress_if_enabled()
 
@@ -421,18 +500,10 @@ func _set_stage(stage: String) -> void:
 ## after _clear_overlay so the fade-out has time to finish.
 func _show_chained_step(stage: String) -> void:
 	match stage:
-		"level0_bullet":
-			_show_step("level0_bullet", {
-				"text": "Hostile fire detected. Enemy bullets can destroy your fighter. Keep moving and do not fly into their path.",
-				"status": "Tap NEXT.", "completion": "continue", "next_stage": "level0_coin",
-				"allow_player_input": false, "dim_amount": 0.58, "allow_skip": false
-			})
+		"level0_attack":
+			_show_step("level0_attack", _attack_lesson_step_def())
 		"level0_coin":
-			_show_step("level0_coin", {
-				"text": "Collect coins to fund permanent ship upgrades between missions.",
-				"status": "Tap NEXT.", "completion": "continue", "next_stage": "level0_powerup",
-				"allow_player_input": false, "dim_amount": 0.48, "allow_skip": false
-			})
+			_show_step("level0_coin", _coin_lesson_step_def())
 		"shop_upgrade":
 			# Reached when the player taps NEXT on the payout reveal.
 			_show_step("shop_upgrade", _shop_upgrade_step_def())
@@ -442,11 +513,33 @@ func _show_chained_step(stage: String) -> void:
 			if int(GameManager.get_current_level()) == 6:
 				_show_step("shadow_level6", _shadow_level6_step_def())
 		"level0_powerup":
-			_show_step("level0_powerup", {
-				"text": "Collect power cores to increase your firepower during this mission.",
-				"status": "Tap NEXT to begin combat.", "completion": "continue", "next_stage": "level0_combat",
-				"allow_player_input": false, "dim_amount": 0.48, "allow_skip": false
-			})
+			_show_step("level0_powerup", _powerup_lesson_step_def())
+
+## Step definitions for the event-driven Level 0 lessons. Shared by the live
+## triggers (notify_*) and the restart re-presentation path.
+func _attack_lesson_step_def() -> Dictionary:
+	return {
+		"text": "Hostile fire! Enemy bullets destroy your fighter - keep moving and stay out of their path.",
+		"status": "Tap NEXT to resume combat.", "completion": "continue", "next_stage": "",
+		"allow_player_input": false, "allow_skip": false, "slow_motion": true,
+		"target_paths": [{"path": "!EnemyBullet", "status": "INCOMING FIRE"}],
+	}
+
+func _coin_lesson_step_def() -> Dictionary:
+	return {
+		"text": "A coin drop! Collect coins to fund permanent ship upgrades between missions.",
+		"status": "Tap NEXT to continue.", "completion": "continue", "next_stage": "",
+		"allow_player_input": false, "allow_skip": false,
+		"target_paths": [{"path": "!Coins", "status": "COLLECT ME"}],
+	}
+
+func _powerup_lesson_step_def() -> Dictionary:
+	return {
+		"text": "A power core! Grab power-ups mid-mission to boost firepower or restore a life.",
+		"status": "Tap NEXT to continue.", "completion": "continue", "next_stage": "",
+		"allow_player_input": false, "allow_skip": false,
+		"target_paths": [{"path": "!Powerup", "status": "POWER-UP"}],
+	}
 
 func _set_player_input_enabled(enabled: bool) -> void:
 	var player: Node = get_tree().get_first_node_in_group("Player")
@@ -470,6 +563,7 @@ func _clear_overlay(enable_player_input: bool) -> void:
 	var overlay_to_dismiss: TutorialOverlay = _overlay
 	_active_id = ""
 	_active_step.clear()
+	_pending_step_stage = ""
 	_tutorial_layer = null
 	_overlay = null
 	_clearing = true
@@ -490,9 +584,7 @@ func _free_layer(layer: CanvasLayer) -> void:
 ## --- Startup recovery ---
 
 const _IN_PROGRESS_LEVEL_STAGES: Array[String] = [
-	"level0_intro", "level0_bullet",
-	"level0_coin", "level0_powerup", "level0_combat",
-	"level0_revive",
+	"level0_intro", "level0_revive",
 ]
 
 ## Shadow Drive stages. They belong to a guided lesson that happens at level 5

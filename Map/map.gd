@@ -194,9 +194,9 @@ func update_stars():
 		var level_num = i + 1
 		
 		# Get the star sprites from the button
-		var star_bronze: Sprite2D = _get_star_sprite(button, "Star_bronze")
-		var star_silver: Sprite2D = _get_star_sprite(button, "Star_silver")
-		var star_gold: Sprite2D = _get_star_sprite(button, "Star_gold")
+		var star_bronze: TextureRect = _get_star_sprite(button, "Star_bronze")
+		var star_silver: TextureRect = _get_star_sprite(button, "Star_silver")
+		var star_gold: TextureRect = _get_star_sprite(button, "Star_gold")
 		if star_bronze and star_silver and star_gold:
 			
 			# Get star level based on highest difficulty completed
@@ -234,20 +234,20 @@ func update_stars():
 func _on_level_star_earned(_level_num: int = 0):
 	update_stars()
 
-func _get_star_sprite(button: Node, star_name: String) -> Sprite2D:
+func _get_star_sprite(button: Node, star_name: String) -> TextureRect:
 	if button == null:
 		return null
 
 	# Current level button layout stores stars under the `Stars` child node.
 	var nested_path := "Stars/%s" % star_name
 	var nested_star := button.get_node_or_null(nested_path)
-	if nested_star is Sprite2D:
-		return nested_star as Sprite2D
+	if nested_star is TextureRect:
+		return nested_star as TextureRect
 
 	# Backward-compat fallback for layouts where stars are direct children.
 	var direct_star := button.get_node_or_null(star_name)
-	if direct_star is Sprite2D:
-		return direct_star as Sprite2D
+	if direct_star is TextureRect:
+		return direct_star as TextureRect
 
 	return null
 
