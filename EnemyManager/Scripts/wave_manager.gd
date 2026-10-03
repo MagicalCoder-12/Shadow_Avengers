@@ -749,9 +749,16 @@ func _complete_wave():
 	if GameManager.debug_mode:
 		print("WaveManager: Starting wave delay timer for %f seconds" % wave_delay)
 
-	# Create timer for next wave
+	# Create timer for next wave. SceneTreeTimer outlives scene changes, so if
+	# the player restarts/exits during the delay this manager is freed while
+	# the timer is still pending - bail out explicitly instead of resuming on
+	# a dead object.
+	var self_ref: WeakRef = weakref(self)
 	var timer = get_tree().create_timer(wave_delay, false)
 	await timer.timeout
+
+	if self_ref.get_ref() == null:
+		return
 
 	if GameManager.debug_mode:
 		print("WaveManager: Wave delay timer finished - setting waiting_for_next_wave = false")

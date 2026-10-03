@@ -387,6 +387,11 @@ func _on_wave_manager_all_waves_cleared():
 		
 		if is_boss_wave:
 			DebugFlags.debug_print("Level.gd: Boss wave cleared, checking if first time completion")
+			# The immediate boss-defeated signal already showed the end screen
+			# seconds earlier; showing (and paying) a second one here would
+			# double the BossClear/LevelCompleted UI and its rewards.
+			if _is_boss_end_screen_visible():
+				return
 			# Check if this is the first time completing this boss level
 			var boss_levels_completed = GameManager.save_manager.boss_levels_completed
 			var is_first_time = not boss_levels_completed.has(current_level_num)
@@ -424,6 +429,12 @@ func _on_boss_defeated() -> void:
 			_show_level_completed_ui()
 	else:
 		DebugFlags.debug_print("Level.gd: Revive pending, ignoring boss defeat")
+
+## True while either end-of-level screen is on screen. Boss kills fan out to
+## two signals (immediate boss-defeated, delayed all-waves-cleared); whichever
+## shows first wins, the other must stand down to avoid double UI + rewards.
+func _is_boss_end_screen_visible() -> bool:
+	return (boss_clear != null and boss_clear.visible) or (level_completed != null and level_completed.visible)
 
 func _show_boss_clear_ui():
 	get_tree().paused = false
@@ -557,6 +568,10 @@ func handle_node_added(node: Node) -> void:
 func _on_level_manager_boss_defeated() -> void:
 	# This is called when a boss is defeated through LevelManager
 	# Show the appropriate screen based on whether it's the first time completing this boss level
+	# Guarded both ways: the delayed all-waves signal must not re-show after us,
+	# and we must not re-show after it.
+	if has_completed_level or _is_boss_end_screen_visible():
+		return
 	var current_level: int = GameManager.level_manager.get_current_level()
 	var boss_levels_completed = GameManager.save_manager.boss_levels_completed
 	var is_first_time = not boss_levels_completed.has(current_level)

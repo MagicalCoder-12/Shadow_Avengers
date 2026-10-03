@@ -906,7 +906,9 @@ func _draw() -> void:
 func _show_spawn_indicators(enemy_count: int) -> void:
 	if not show_spawn_indicators:
 		return
-	
+
+	# SceneTreeTimer outlives scene changes; bail if we were freed mid-wait.
+	var self_ref: WeakRef = weakref(self)
 	var indicator_nodes: Array[Node2D] = []
 	
 	# Create visual indicators at each spawn position
@@ -947,7 +949,9 @@ func _show_spawn_indicators(enemy_count: int) -> void:
 	# Wait for the indicator duration
 	if get_tree():
 		await get_tree().create_timer(spawn_indicator_duration).timeout
-	
+
+	if self_ref.get_ref() == null:
+		return
 	# Clean up indicator nodes
 	for indicator in indicator_nodes:
 		if is_instance_valid(indicator):
