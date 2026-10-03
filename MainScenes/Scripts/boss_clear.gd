@@ -105,6 +105,8 @@ func _apply_boss_rewards() -> void:
 			GameManager.mark_boss_level_completed(current_level)
 		else:
 			DebugFlags.debug_print("[BossClear Debug] Boss level %d already completed before")
+			# Repeat boss clears grant a small void shard consolation.
+			GameManager.add_currency("void_shards", 5)
 		
 		# Also add any collected coins and crystals from the level (if any)
 		var collected_coins = GameManager.coins_collected_this_level if GameManager else 0

@@ -11,7 +11,7 @@ signal shadow_mode_requested
 
 # Configuration
 @export var max_charge: float = 100.0
-@export var charge_per_enemy: float = 10.0
+@export var charge_per_enemy: float = 6.0
 
 # State
 var current_charge: float = 0.0

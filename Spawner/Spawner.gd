@@ -72,31 +72,29 @@ func _on_PowerupSpawnTimer_timeout() -> void:
 		powerupSpawnTimer.stop()
 		return
 	
-	# Weighted random selection:
-	# - Asteroid: 50%
-	# - Attack Boost: 25%
-	# - Super Mode: 15%
-	# - Health: 10%
+	# Weighted random selection (powerups first: 80% of rolls):
+	# - Asteroid: 20%
+	# - Attack Boost: 40%
+	# - Super Mode: 20%
+	# - Health: 20%
 	var roll = randf() * 100  # Random number between 0 and 100
 	var selected_scene
 	var is_astroid = false
-	
-	if roll < 50:
+
+	if roll < 20:
 		selected_scene = powerup_scenes[2]  # Asteroid
 		is_astroid = true
-	elif roll < 75:
+	elif roll < 60:
 		selected_scene = powerup_scenes[0]  # Attack Boost
-	elif roll < 90:
+	elif roll < 80:
 		selected_scene = powerup_scenes[1]  # Super Mode
 	else:
 		selected_scene = powerup_scenes[3]  # Health
-	
+
 	if is_astroid:
-		var num_asteroids = randi_range(1, 2)
-		for i in range(num_asteroids):
-			var astroid: Node = selected_scene.instantiate()
-			astroid.position = get_random_spawn_pos(astroid)
-			SceneSpawnService.spawn_child(astroid)
+		var asteroid: Node = selected_scene.instantiate()
+		asteroid.position = get_random_spawn_pos(asteroid)
+		SceneSpawnService.spawn_child(asteroid)
 	else:
 		# Spawn a single powerup
 		var powerup: Node = selected_scene.instantiate()

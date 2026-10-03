@@ -12,159 +12,160 @@ tr-TR, zh-CN.
 
 ## v1.4 (current)
 
-<en-IN>
-⭐ Fixed level stars & unlocks — boss victories now always unlock the next level and award stars!
+<en-IN> 
+Fixed level stars and unlocks — bosses now unlock the next level and award stars.
 
-🛠️ Fixed shop tutorial soft-lock — map buttons stay responsive after the ship hangar visit.
+Fixed shop tutorial — map buttons now work after visiting the hangar.
 
-🛒 New MAX badge — maxed-out ships & satellites clearly show MAX instead of upgrade buttons.
+Added MAX badge — maxed ships and satellites now show MAX.
 
-👾 Mixed enemy formations — waves now blend different enemy types for trickier fights.
+Added mixed enemy waves — different enemy types can appear together.
 
-🎓 Smarter training highlights — tutorial cards spotlight live bullets, coins & power cores.
+Improved training — tutorials now highlight bullets, coins and power cores.
 </en-IN>
+
 <de-DE>
-⭐ Sterne & Freischaltungen repariert – Boss-Siege schalten jetzt immer das nächste Level frei und vergeben Sterne!
+ Sterne und Freischaltungen behoben – Bosse schalten das nächste Level frei und geben Sterne.
 
-🛠️ Shop-Tutorial-Softlock behoben – Karten-Buttons bleiben nach dem Werftbesuch reaktionsfähig.
+Shop-Tutorial behoben – Karten-Buttons funktionieren nach dem Hangarbesuch.
 
-🛒 Neues MAX-Abzeichen – voll aufgewertete Schiffe & Satelliten zeigen klar MAX statt Upgrade-Buttons.
+MAX-Abzeichen hinzugefügt – voll aufgewertete Schiffe und Satelliten zeigen MAX.
 
-👾 Gemischte Gegnerformationen – Wellen mischen jetzt verschiedene Gegnertypen für kniffligere Kämpfe.
+Gemischte Gegnerwellen hinzugefügt – verschiedene Gegnertypen erscheinen zusammen.
 
-🎓 Schlauere Trainings-Highlights – Tutorial-Karten markieren scharfe Kugeln, Münzen & Powerkerne.
+Training verbessert – Tutorials markieren Kugeln, Münzen und Powerkerne.
 </de-DE>
-<es-419>
 
-⭐ Estrellas y desbloqueos corregidos: las victorias contra jefes siempre desbloquean el siguiente nivel y otorgan estrellas.
+<es-419> 
+Estrellas y desbloqueos corregidos: los jefes desbloquean el siguiente nivel y dan estrellas.
 
-🛠️ Bloqueo del tutorial de la tienda corregido: los botones del mapa siguen respondiendo tras visitar el hangar.
+Tutorial de tienda corregido: los botones del mapa funcionan tras visitar el hangar.
 
-🛒 Nueva insignia MAX: naves y satélites al máximo muestran MAX en vez de botones de mejora.
+Nueva insignia MAX: naves y satélites al máximo muestran MAX.
 
-👾 Formaciones enemigas mixtas: las oleadas combinan distintos tipos de enemigos.
+Nuevas oleadas mixtas: distintos tipos de enemigos aparecen juntos.
 
-🎓 Guía de entrenamiento más inteligente: el tutorial resalta balas, monedas y núcleos en vivo.
+Entrenamiento mejorado: resalta balas, monedas y núcleos.
 </es-419>
-<es-ES>
 
-⭐ Estrellas y desbloqueos corregidos: las victorias contra jefes siempre desbloquean el siguiente nivel y otorgan estrellas.
+<es-ES> 
+Estrellas y desbloqueos corregidos: los jefes desbloquean el siguiente nivel y dan estrellas.
 
-🛠️ Bloqueo del tutorial de la tienda corregido: los botones del mapa siguen respondiendo tras visitar el hangar.
+Tutorial de tienda corregido: los botones del mapa funcionan tras visitar el hangar.
 
-🛒 Nueva insignia MAX: naves y satélites al máximo muestran MAX en vez de botones de mejora.
+Nueva insignia MAX: naves y satélites al máximo muestran MAX.
 
-👾 Formaciones enemigas mixtas: las oleadas combinan distintos tipos de enemigos.
+Nuevas oleadas mixtas: distintos tipos de enemigos aparecen juntos.
 
-🎓 Guía de entrenamiento más inteligente: el tutorial resalta balas, monedas y núcleos en vivo.
+Entrenamiento mejorado: resalta balas, monedas y núcleos.
 </es-ES>
-<fr-FR>
 
-⭐ Étoiles et déblocages corrigés : les victoires contre les boss débloquent toujours le niveau suivant et attribuent les étoiles !
+<fr-FR> 
+Étoiles et déblocages corrigés : les boss débloquent le niveau suivant et donnent des étoiles.
 
-🛠️ Blocage du tutoriel boutique corrigé : les boutons de la carte restent réactifs après la visite du hangar.
+Tutoriel boutique corrigé : les boutons de la carte fonctionnent après le hangar.
 
-🛒 Nouveau badge MAX : vaisseaux et satellites au max affichent MAX au lieu des boutons d'amélioration.
+Nouveau badge MAX : les vaisseaux et satellites au max affichent MAX.
 
-👾 Formations ennemies mixtes : les vagues mélangent désormais plusieurs types d'ennemis.
+Nouvelles vagues mixtes : différents types d’ennemis apparaissent ensemble.
 
-🎮 Tutoriel plus malin : les cartes mettent en lumière balles, pièces et noyaux en direct.
+Entraînement amélioré : le tutoriel met en avant balles, pièces et noyaux.
 </fr-FR>
-<hi-IN>
 
-⭐ लेवल स्टार और अनलॉक ठीक किए गए – बॉस जीतने पर अब हमेशा अगला लेवल और स्टार मिलेंगे!
+<hi-IN> 
+लेवल स्टार और अनलॉक ठीक किए गए – बॉस अगला लेवल और स्टार देंगे।
 
-🛠️ शॉप ट्यूटोरियल लॉक ठीक किया गया – हैंगर विज़िट के बाद मैप बटन काम करते रहेंगे।
+शॉप ट्यूटोरियल ठीक किया गया – हैंगर के बाद मैप बटन काम करेंगे।
 
-🛒 नया MAX बैज – मैक्स ships व satellites पर अपग्रेड बटन की जगह साफ़ MAX दिखेगा।
+नया MAX बैज – मैक्स ships और satellites पर MAX दिखेगा।
 
-👾 मिक्स्ड दुश्मन फॉर्मेशन – वेव्स में अब अलग-अलग दुश्मन एक साथ आएंगे।
+मिक्स्ड दुश्मन वेव्स – अलग-अलग दुश्मन साथ आएंगे।
 
-🎓 स्मार्ट ट्रेनिंग हाइलाइट – ट्यूटोरियल अब असली बुलेट, सिक्कों और पावर कोर को हाइलाइट करेगा।
+ट्रेनिंग बेहतर – बुलेट, सिक्के और पावर कोर हाइलाइट होंगे।
 </hi-IN>
-<id>
 
-⭐ Bintang & pembuka level diperbaiki – kemenangan boss selalu membuka level berikutnya dan memberi bintang!
+<id> 
+Bintang dan pembuka level diperbaiki – boss membuka level berikutnya dan memberi bintang.
 
-🛠️ Soft-lock tutorial toko diperbaiki – tombol peta tetap responsif setelah kunjungan hangar.
+Tutorial toko diperbaiki – tombol peta berfungsi setelah mengunjungi hangar.
 
-🛒 Lencana MAX baru – kapal & satelit max kini menampilkan MAX, bukan tombol upgrade.
+Lencana MAX ditambahkan – kapal dan satelit maksimal menampilkan MAX.
 
-👾 Formasi musuh campuran – wave kini memadukan berbagai jenis musuh.
+Wave musuh campuran – berbagai jenis musuh muncul bersama.
 
-🎓 Sorotan latihan lebih pintar – kartu tutorial menyorot peluru, koin & inti secara langsung.
+Pelatihan ditingkatkan – tutorial menyorot peluru, koin, dan inti.
 </id>
-<it-IT>
 
-⭐ Stelle e sblocchi corretti: le vittorie contro i boss sbloccano sempre il livello successivo e assegnano le stelle!
+<it-IT> 
+Corrette stelle e sblocchi: i boss sbloccano il livello successivo e danno stelle.
 
-🛠️ Blocco del tutorial negozio corretto: i pulsanti della mappa restano reattivi dopo la visita all'hangar.
+Tutorial negozio corretto: i pulsanti della mappa funzionano dopo l’hangar.
 
-🛒 Nuovo badge MAX: navi e satelliti al massimo mostrano MAX al posto dei pulsanti di potenziamento.
+Nuovo badge MAX: navi e satelliti al massimo mostrano MAX.
 
-👾 Formazioni nemiche miste: le ondate ora mescolano diversi tipi di nemici.
+Nuove ondate miste: diversi tipi di nemici appaiono insieme.
 
-🎓 Evidenziazioni più intelligenti: il tutorial mette in luce proiettili, monete e nuclei in tempo reale.
+Allenamento migliorato: evidenzia proiettili, monete e nuclei.
 </it-IT>
-<ja-JP>
 
-⭐ レベルのスター＆アンロックを修正：ボス撃破で次のレベルとスターが必ず獲得できます！
+<ja-JP> 
+レベルのスターとアンロックを修正。ボス撃破で次のレベルとスターを獲得できます。
 
-🛠️ ショップチュートリアルの進行不能を修正：格納庫の後もマップボタンが反応します。
+ショップチュートリアルを修正。格納庫後もマップボタンが使えます。
 
-🛒 新しいMAXバッジ：最大強化の機体・サテライトはボタンの代わりにMAX表示に。
+MAXバッジを追加。最大強化の機体とサテライトにMAXを表示。
 
-👾 混合フォーメーション：ウェーブに複数の敵タイプが混ざって登場。
+混合ウェーブを追加。複数の敵タイプが一緒に登場します。
 
-🎓 賢いトレーニング演出：実弾・コイン・パワーコアをハイライト表示。
+トレーニングを改善。弾、コイン、パワーコアを強調します。
 </ja-JP>
-<ko-KR>
 
-⭐ 레벨 별 및 해금 수정 – 보스 승리 시 다음 레벨과 별을 항상 획득합니다!
+<ko-KR> 
+레벨 별과 해금을 수정했습니다. 보스 승리 시 다음 레벨과 별을 얻습니다.
 
-🛠️ 상점 튜토리얼 멈춤 수정 – 격납고 방문 후에도 맵 버튼이 정상 작동합니다.
+상점 튜토리얼을 수정했습니다. 격납고 후에도 맵 버튼이 작동합니다.
 
-🛒 신규 MAX 배지 – 최대 강화 함선·위성은 업그레이드 버튼 대신 MAX가 표시됩니다.
+MAX 배지를 추가했습니다. 최대 강화 함선과 위성에 MAX가 표시됩니다.
 
-👾 혼합 적 편대 – 웨이브에 다양한 적 유형이 함께 등장합니다.
+혼합 적 웨이브를 추가했습니다. 다양한 적이 함께 등장합니다.
 
-🎓 스마트 훈련 하이라이트 – 실탄·코인·파워코어를 직접 조명합니다.
+훈련을 개선했습니다. 탄환, 코인, 파워코어를 강조합니다.
 </ko-KR>
-<ru-RU>
 
-⭐ Исправлены звёзды и разблокировки – победы над боссами всегда открывают следующий уровень и дают звёзды!
+<ru-RU> 
+Исправлены звёзды и разблокировки – боссы открывают следующий уровень и дают звёзды.
 
-🛠️ Исправлена блокировка обучения в магазине – кнопки карты работают после визита в ангар.
+Исправлено обучение в магазине – кнопки карты работают после ангара.
 
-🛒 Новый значок MAX – прокачанные корабли и спутники показывают MAX вместо кнопок улучшения.
+Добавлен значок MAX – полностью улучшенные корабли и спутники показывают MAX.
 
-👾 Смешанные формации врагов – в волнах теперь разные типы врагов.
+Смешанные волны – разные типы врагов появляются вместе.
 
-🎓 Умные подсказки обучения – карточки подсвечивают пули, монеты и ядра в реальном времени.
+Обучение улучшено – подсвечиваются пули, монеты и ядра.
 </ru-RU>
-<tr-TR>
 
-⭐ Seviye yıldızları ve kilitler düzeltildi – boss zaferleri artık sonraki seviyeyi ve yıldızları her zaman açıyor!
+<tr-TR> 
+Seviye yıldızları ve kilitler düzeltildi – bosslar sonraki seviyeyi açıyor ve yıldız veriyor.
 
-🛠️ Mağaza eğitimi kilitlenmesi düzeltildi – hangar ziyaretinden sonra harita butonları çalışmaya devam ediyor.
+Mağaza eğitimi düzeltildi – hangar sonrası harita butonları çalışıyor.
 
-🛒 Yeni MAX rozeti – maksimum gemiler ve uydular yükseltme butonu yerine MAX gösteriyor.
+MAX rozeti eklendi – maksimum gemiler ve uydular MAX gösteriyor.
 
-👾 Karışık düşman dizilimleri – dalgalarda artık farklı düşman türleri bir arada.
+Karışık düşman dalgaları – farklı düşman türleri birlikte geliyor.
 
-🎓 Akıllı eğitim vurguları – eğitim kartları gerçek mermileri, paraları ve çekirdekleri işaretliyor.
+Eğitim iyileştirildi – mermi, para ve çekirdekler vurgulanıyor.
 </tr-TR>
-<zh-CN>
 
-⭐ 修复关卡星星与解锁——击败Boss必定解锁下一关并获得星星！
+<zh-CN> 
+修复关卡星星和解锁——Boss解锁下一关并获得星星。
 
-🛠️ 修复商店教程卡死——访问机库后地图按钮保持响应。
+修复商店教程——访问机库后地图按钮仍可用。
 
-🛒 新增MAX标识——满级飞船和卫星直接显示MAX，不再显示升级按钮。
+新增MAX标识——满级飞船和卫星显示MAX。
 
-👾 混合敌方阵型——波次中出现多种敌人组合，战斗更棘手。
+新增混合敌人波次——不同类型敌人一起出现。
 
-🎮 更智能的新手高亮——教程卡片实时高亮子弹、金币与能量核。
+优化训练提示——高亮子弹、金币和能量核。
 </zh-CN>
 
 ---

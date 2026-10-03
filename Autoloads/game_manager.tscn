@@ -6,7 +6,6 @@
 
 [node name="GameManager" type="Node2D" unique_id=2082259744 groups=["GameManager"]]
 script = ExtResource("1_dmm7s")
-debug_mode = true
 upgrade_menu_scene = ExtResource("2_mx4pe")
 
 [node name="ShadowModeTimer" type="Timer" parent="." unique_id=301455201]
@@ -15,6 +14,7 @@ autostart = true
 
 [node name="Admob" type="Node" parent="." unique_id=1686134296]
 script = ExtResource("2_40v6j")
+is_real = true
 max_ad_content_rating = 1
 child_directed = 0
 under_age_of_consent = 0

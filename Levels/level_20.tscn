@@ -16,63 +16,81 @@ shader_parameter/brightness = 0.50000002375
 [sub_resource type="Resource" id="Resource_joty3"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 7
+enemy_density = "Dense"
+formation_type = 0
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_5n4b7"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 8
+enemy_density = "Dense"
+formation_type = 1
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_4aujh"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 10
+enemy_density = "Dense"
+formation_type = 3
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_u0udy"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 9
+enemy_density = "Dense"
+formation_type = 2
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_5jrpr"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 6
+enemy_density = "Maximum"
+formation_type = 8
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_2xnp3"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 10
+enemy_density = "Maximum"
+formation_type = 5
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_6oi66"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 9
+enemy_density = "Maximum"
+formation_type = 6
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_ux0e7"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 4
+enemy_density = "Maximum"
+formation_type = 7
 formation_radius = 150.0
 entry_speed = 300.0
 
 [sub_resource type="Resource" id="Resource_a3h6j"]
 script = ExtResource("2_3xxbo")
 difficulty = 1
-enemy_density = "Normal"
+enemy_type = 10
+enemy_density = "Maximum"
+formation_type = 10
 formation_radius = 150.0
 entry_speed = 300.0
 

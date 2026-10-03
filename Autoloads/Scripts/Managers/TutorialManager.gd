@@ -397,6 +397,11 @@ func _on_shadow_mode_activated() -> void:
 	if get_campaign_stage() == "shadow_charge_explained" and int(GameManager.get_current_level()) == 6:
 		_set_stage("shadow_activated")
 		SaveManager.mark_tutorial_completed(SHADOW_MODE_ID)
+		# Dynamic lookup so the core game never hard-depends on the addon.
+		if is_inside_tree():
+			var pg: Node = get_tree().root.get_node_or_null("PlayGamesManager")
+			if pg != null and pg.has_method("unlock_achievement"):
+				pg.call("unlock_achievement", "shadow_first")
 
 func notify_overclock_reached() -> void:
 	if SaveManager.get_tutorial_flag("overclock_explained") or not _active_id.is_empty():

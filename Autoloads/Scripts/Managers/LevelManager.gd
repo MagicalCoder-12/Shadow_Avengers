@@ -134,9 +134,34 @@ func complete_level(current_level: int) -> void:
 		unlocked_levels = next_level
 		gm.save_progress_if_enabled()
 		gm.level_unlocked.emit(next_level)
-	
+
+	# Google Play Games: best-score board + milestone achievements.
+	# Routed dynamically so the core game never hard-depends on the addon.
+	_report_play_games_completion(current_level, is_first_time_completion)
+
 	if should_transition_to_next_level:
 		is_level_just_completed = false
+
+
+## Forwards completion events to the optional Play Games integration.
+## Dynamic lookup (not a static reference) so a missing or broken addon can
+## never break level completion. Every call no-ops off Android or until Play
+## Console IDs are configured.
+func _report_play_games_completion(level_num: int, is_first_time: bool) -> void:
+	if not is_inside_tree():
+		return
+	var pg: Node = get_tree().root.get_node_or_null("PlayGamesManager")
+	if pg == null:
+		return
+	if gm.score > 0 and pg.has_method("submit_level_score"):
+		pg.call("submit_level_score", gm.score)
+	if is_first_time and pg.has_method("unlock_achievement"):
+		if level_num % 5 == 0 and level_num > 0:
+			pg.call("unlock_achievement", "boss_%d" % level_num)
+		if level_num == 10:
+			pg.call("unlock_achievement", "level_10")
+		if level_num == 20:
+			pg.call("unlock_achievement", "level_20")
 
 func _unlock_difficulty_selection() -> void:
 	# Trigger difficulty unlock notification when level 10 is completed

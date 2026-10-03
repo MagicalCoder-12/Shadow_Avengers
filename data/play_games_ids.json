@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"_note": "Paste IDs from Play Console > Play Games Services. Anything left as REPLACE_WITH_* disables that call.",
+	"leaderboard_best_score": "REPLACE_WITH_LEADERBOARD_ID",
+	"achievements": {
+		"boss_5": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"boss_10": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"boss_15": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"boss_20": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"level_10": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"level_20": "REPLACE_WITH_ACHIEVEMENT_ID",
+		"shadow_first": "REPLACE_WITH_ACHIEVEMENT_ID"
+	}
+}

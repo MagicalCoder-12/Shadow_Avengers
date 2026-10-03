@@ -175,7 +175,7 @@ func _get_default_hud_settings() -> Dictionary:
 	if data is Dictionary:
 		return data
 	return {
-		"charge_per_enemy": 10.0,
+		"charge_per_enemy": 6.0,
 		"max_charge": 100.0
 	}
 

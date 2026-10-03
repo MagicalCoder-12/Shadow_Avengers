@@ -655,7 +655,13 @@ func _apply_enemy_rewards(payload: Dictionary) -> void:
 
 	# Scale rewards based on level (higher levels give more rewards)
 	var level_multiplier = pow(float(game_level), 0.5)  # Square root scaling
-	var scaled_coins = int(coins_per_enemy * level_multiplier)
+	# Per-difficulty repeat penalty on COINS only (crystal drops stay untouched,
+	# they are rare enough): the first clear of a level in a difficulty pays
+	# full base rewards, replays in the same difficulty pay 50%.
+	var repeat_multiplier := 1.0
+	if _is_level_cleared_in_current_difficulty(game_level):
+		repeat_multiplier = 0.5
+	var scaled_coins = int(coins_per_enemy * level_multiplier * repeat_multiplier)
 	var scaled_crystal_reward = int(crystal_reward_per_drop * level_multiplier)
 
 	# Determine what to drop - either coins OR crystals, not both
@@ -687,6 +693,23 @@ func _apply_enemy_rewards(payload: Dictionary) -> void:
 		# Drop power-ups occasionally
 		if randf() < 0.3:  # 30% chance to drop a power-up
 			_drop_powerup(drop_position)
+
+## True once this level has been cleared in the currently selected difficulty.
+## Drives the 50% repeat-clear penalty on coin drops (crystals are exempt).
+func _is_level_cleared_in_current_difficulty(game_level: int) -> bool:
+	if game_manager == null or game_manager.save_manager == null:
+		return false
+	var diff_name := ""
+	match int(game_manager.current_difficulty):
+		0:
+			diff_name = "Easy"
+		1:
+			diff_name = "Normal"
+		2:
+			diff_name = "Hard"
+		_:
+			return false
+	return game_manager.save_manager.is_level_completed_in_difficulty(game_level, diff_name)
 
 func _drop_powerup(drop_position: Vector2) -> void:
 	# Instantiate and drop a random power-up

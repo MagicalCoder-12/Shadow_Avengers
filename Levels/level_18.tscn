@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://ce0cslus5mqjn" path="res://Levels/level_1.tscn" id="1_k0rf0"]
 [ext_resource type="Texture2D" uid="uid://bg2h5uay3e3p5" path="res://Assets/Background/bg3.png" id="2_iyqkj"]
 [ext_resource type="Shader" uid="uid://d16n3s0prxcam" path="res://Shaders/Background.gdshader" id="2_smu6s"]
+[ext_resource type="Script" uid="uid://b42hpe1j0n2xx" path="res://EnemyManager/Scripts/WaveConfig.gd" id="2_l18wv"]
 
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jx6lc"]
@@ -10,6 +11,69 @@ shader = ExtResource("2_smu6s")
 shader_parameter/direction = Vector2(0, -1.5)
 shader_parameter/speed_scale = 0.1
 shader_parameter/brightness = 0.50000002375
+
+[sub_resource type="Resource" id="Resource_l18w1"]
+script = ExtResource("2_l18wv")
+enemy_type = 7
+enemy_density = "Dense"
+formation_type = 0
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w2"]
+script = ExtResource("2_l18wv")
+enemy_type = 10
+enemy_density = "Dense"
+formation_type = 1
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w3"]
+script = ExtResource("2_l18wv")
+enemy_type = 9
+enemy_density = "Dense"
+formation_type = 3
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w4"]
+script = ExtResource("2_l18wv")
+enemy_type = 6
+enemy_density = "Maximum"
+formation_type = 8
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w5"]
+script = ExtResource("2_l18wv")
+enemy_type = 8
+enemy_density = "Dense"
+formation_type = 7
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w6"]
+script = ExtResource("2_l18wv")
+enemy_type = 4
+enemy_density = "Maximum"
+formation_type = 5
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w7"]
+script = ExtResource("2_l18wv")
+enemy_type = 10
+enemy_density = "Dense"
+formation_type = 9
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w8"]
+script = ExtResource("2_l18wv")
+enemy_type = 9
+enemy_density = "Maximum"
+formation_type = 6
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
+
+[sub_resource type="Resource" id="Resource_l18w9"]
+script = ExtResource("2_l18wv")
+enemy_type = 7
+enemy_density = "Maximum"
+formation_type = 10
+metadata/_custom_type_script = "uid://b42hpe1j0n2xx"
 
 [node name="Level_18" unique_id=1232203961 instance=ExtResource("1_k0rf0")]
 
@@ -20,6 +84,7 @@ texture = ExtResource("2_iyqkj")
 
 [node name="LevelManager" parent="." index="5" unique_id=302384067]
 level_num = 18
+waves = Array[ExtResource("2_l18wv")]([SubResource("Resource_l18w1"), SubResource("Resource_l18w2"), SubResource("Resource_l18w3"), SubResource("Resource_l18w4"), SubResource("Resource_l18w5"), SubResource("Resource_l18w6"), SubResource("Resource_l18w7"), SubResource("Resource_l18w8"), SubResource("Resource_l18w9")])
 
 [node name="WaveManager" parent="." index="7" unique_id=790346136]
 wave_delay = 1.5

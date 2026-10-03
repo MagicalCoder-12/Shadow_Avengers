@@ -34,6 +34,10 @@ var wave_details_tween: Tween = null
 const WAVE_DETAILS_DISPLAY_DURATION: float = 2.5
 const WAVE_DETAILS_FADE_DURATION: float = 0.4
 
+# Preloaded (not global class_name) so the mixer resolves even before the
+# editor's global script class cache picks up the new file.
+const WaveMixerScript = preload("res://EnemyManager/Scripts/wave_mixer.gd")
+
 # Signals 
 @warning_ignore("unused_signal")
 signal Victory_pose()
@@ -180,6 +184,14 @@ func _initialize_waves() -> void:
 					wave.get_enemy_count()
 				])
 	
+	# Blend shooter + pressure types into every wave (Chicken Invaders style).
+	# enrich_waves duplicates configs, so shared/inherited scene resources
+	# are never mutated by the mixing.
+	waves = WaveMixerScript.enrich_waves(waves, level_num)
+	if GameManager.debug_mode:
+		for i in range(waves.size()):
+			print("LevelManager: Wave %d mixed: %s" % [i + 1, WaveMixerScript.describe(waves[i])])
+
 	# Send waves to WaveManager and start spawning
 	wave_manager.set_waves(waves)
 	wave_manager.current_level = level_num
@@ -455,6 +467,8 @@ func _show_level_completed_ui():
 		# Add the rewards to the player's currency
 		GameManager.add_currency("coins", collected_coins)
 		GameManager.add_currency("crystals", collected_crystals)
+		# Repeat boss clears also grant a small void shard consolation.
+		GameManager.add_currency("void_shards", 5)
 		
 		# Save progress
 		if GameManager.save_manager.autosave_progress:

@@ -58,6 +58,15 @@ font_size = 50
 font = ExtResource("1_mddtv")
 font_size = 50
 
+[sub_resource type="LabelSettings" id="LabelSettings_wrg6i"]
+font = ExtResource("13_n170t")
+font_size = 150
+font_color = Color(1, 1, 0, 1)
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 15
+shadow_color = Color(1, 1, 0, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5osyu"]
 bg_color = Color(0, 1, 0.6, 1)
 
@@ -114,11 +123,6 @@ font_color = Color(0.858054, 0.000423358, 0.822598, 1)
 font = ExtResource("1_mddtv")
 font_size = 50
 font_color = Color(0.858824, 0, 0.823529, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_wrg6i"]
-font = ExtResource("1_mddtv")
-font_size = 50
-font_color = Color(1, 1, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_vfymr"]
 font = ExtResource("1_mddtv")
@@ -371,6 +375,7 @@ vertical_alignment = 1
 [node name="MaxLabel" type="Label" parent="UI/HBoxContainer" unique_id=192837465]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 text = "MAX"
 label_settings = SubResource("LabelSettings_wrg6i")
 horizontal_alignment = 1

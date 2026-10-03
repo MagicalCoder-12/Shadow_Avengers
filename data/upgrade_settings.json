@@ -44,7 +44,7 @@
 	},
 	
 	"enemy_drop_rewards": {
-		"coins_per_enemy": 15,
+		"coins_per_enemy": 10,
 		"coin_drop_chance": 0.7,
 		"crystal_drop_chance": 0.2,
 		"crystal_reward_per_drop": 1

@@ -12,7 +12,7 @@ signal pause_requested
 @onready var power_symbol_3: TextureRect = $HBoxContainer/PowerSymbol3
 @onready var power_symbol_4: TextureRect = $HBoxContainer/PowerSymbol4
 
-@export var charge_per_enemy: float = 10.0
+@export var charge_per_enemy: float = 6.0
 @export var max_charge: float = 100.0
 var elapsed_time: float = 0.0
 
@@ -111,11 +111,11 @@ func update_power_symbols():
 func _load_hud_settings() -> void:
 	"""Load HUD settings from ConfigLoader"""
 	if is_instance_valid(ConfigLoader) and ConfigLoader.hud_settings:
-		charge_per_enemy = ConfigLoader.hud_settings.get("charge_per_enemy", 10.0)
+		charge_per_enemy = ConfigLoader.hud_settings.get("charge_per_enemy", 6.0)
 		max_charge = ConfigLoader.hud_settings.get("max_charge", 100.0)
 	else:
 		# Use default values if ConfigLoader is not available
-		charge_per_enemy = 10.0
+		charge_per_enemy = 6.0
 		max_charge = 100.0
 	
 	# Update shadow mode button settings
