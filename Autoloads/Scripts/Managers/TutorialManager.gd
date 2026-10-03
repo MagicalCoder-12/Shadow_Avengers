@@ -178,6 +178,8 @@ func complete_level_zero() -> bool:
 	# recorded as cleared and Start would keep dropping the player back into it.
 	GameManager.mark_level_completed_if_needed(0)
 	GameManager.save_progress_if_enabled()
+	if GameManager.save_manager:
+		GameManager.save_manager.save_progress(true)
 	GameManager.change_scene(GameManager.get_map_scene_path())
 	return true
 

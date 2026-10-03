@@ -135,6 +135,11 @@ func complete_level(current_level: int) -> void:
 		gm.save_progress_if_enabled()
 		gm.level_unlocked.emit(next_level)
 
+	# Persist synchronously: completion must survive even if the app is killed
+	# during the scene transition that follows (debounced saves flush ~1s later).
+	if gm.save_manager:
+		gm.save_manager.save_progress(true)
+
 	# Google Play Games: best-score board + milestone achievements.
 	# Routed dynamically so the core game never hard-depends on the addon.
 	_report_play_games_completion(current_level, is_first_time_completion)
@@ -429,7 +434,8 @@ func _on_all_waves_cleared() -> void:
 
 func _on_boss_defeated() -> void:
 	# Emit boss_defeated signal for the Level scene to handle.
-	# Score is awarded by Level._on_boss_defeated which also handles UI.
+	# Boss score flows through the normal kill-reward path; the Level scene
+	# decides which end screen to show based on first-time completion.
 	boss_defeated.emit()
 	
 	# For all levels, complete the level properly through the unified flow

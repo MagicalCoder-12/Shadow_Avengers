@@ -412,23 +412,9 @@ func _on_wave_manager_all_waves_cleared():
 			GameManager.level_manager.complete_level(current_level_num)
 
 # === BOSS DEFEATED ===
-func _on_boss_defeated() -> void:
-	if not GameManager.is_revive_pending:
-		GameManager.score += 1000
-		var current_level: int = GameManager.level_manager.get_current_level()
-		
-		# Check if this is the first time completing this boss level
-		var boss_levels_completed = GameManager.save_manager.boss_levels_completed
-		var is_first_time = not boss_levels_completed.has(current_level)
-		
-		if is_first_time:
-			# Show boss clear screen for first time completion
-			_show_boss_clear_ui()
-		else:
-			# For subsequent completions, show normal level completed screen
-			_show_level_completed_ui()
-	else:
-		DebugFlags.debug_print("Level.gd: Revive pending, ignoring boss defeat")
+# NOTE: boss kills are handled by _on_level_manager_boss_defeated (immediate)
+# and _on_wave_manager_all_waves_cleared (delayed); boss score comes from the
+# normal kill-reward path. There is intentionally no _on_boss_defeated here.
 
 ## True while either end-of-level screen is on screen. Boss kills fan out to
 ## two signals (immediate boss-defeated, delayed all-waves-cleared); whichever
